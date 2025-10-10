@@ -201,7 +201,7 @@
                         <TextBlock DockPanel.Dock="Left" Text="Remaining:" Opacity="0.7" Width="110"
                                    VerticalAlignment="Center" />
                         <TextBlock x:Name="BatteryTimeRemaining"
-                                   Text="{Binding BatteryTimeRemainingString , StringFormat='{}{0}%'}"
+                                   Text="{Binding BatteryTimeRemainingString}"
                                    FontWeight="SemiBold" VerticalAlignment="Center" />
                     </DockPanel>
 

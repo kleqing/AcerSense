@@ -233,7 +233,7 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 var batteryInfo = GetBatteryInfo();
                 data.BatteryPercentage = batteryInfo.percentage;
                 data.BatteryStatus = batteryInfo.status;
-                data.BatteryTimeRemaining = $"{batteryInfo.timeRemaining:F2} hours";
+                data.BatteryTimeRemaining = FormatTimeRemain(data.BatteryStatus, batteryInfo.timeRemaining);
                 return data;
             });
 
@@ -316,7 +316,19 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         {
             var cpuInfo = File.ReadAllText("/proc/cpuinfo");
             var modelNameMatch = Regex.Match(cpuInfo, @"model name\s+:\s+(.+)");
-            if (modelNameMatch.Success) return modelNameMatch.Groups[1].Value.Trim();
+
+            if (modelNameMatch.Success)
+            {
+                string fullCpuName = modelNameMatch.Groups[1].Value.Trim();
+                var shortCpuName = Regex.Match(fullCpuName, @"(^(1[1-9]th Gen )?Intel\(R\)\sCore\(TM\)\s[^\s@]+|AMD\sRyzen\s[^\s@]+(\s[^\s@]+)?)");
+
+                if (shortCpuName.Success)
+                {
+                    return shortCpuName.Value.Trim();
+                }
+
+                return fullCpuName.Trim();
+            }
             return "Unknown CPU";
         }
         catch
@@ -621,9 +633,9 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             {
                 Values = _cpuTempHistory,
                 Name = "CPU Temperature",
-                Stroke = new SolidColorPaint(SKColors.CornflowerBlue) { StrokeThickness = 3 },
-                GeometryStroke = new SolidColorPaint(SKColors.DeepSkyBlue),
-                GeometryFill = new SolidColorPaint(SKColors.DeepSkyBlue),
+                Stroke = new SolidColorPaint(SKColors.OrangeRed) { StrokeThickness = 3 },
+                GeometryStroke = new SolidColorPaint(SKColors.OrangeRed),
+                GeometryFill = new SolidColorPaint(SKColors.OrangeRed),
                 Fill = new SolidColorPaint(SKColors.Transparent),
                 GeometrySize = 5,
                 XToolTipLabelFormatter = chartPoint => $"CPU: {chartPoint.Label}°C"
@@ -632,9 +644,9 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             {
                 Values = _gpuTempHistory,
                 Name = "GPU Temperature",
-                Stroke = new SolidColorPaint(SKColors.LimeGreen) { StrokeThickness = 3 },
-                GeometryFill = new SolidColorPaint(SKColors.GreenYellow),
-                GeometryStroke = new SolidColorPaint(SKColors.GreenYellow),
+                Stroke = new SolidColorPaint(SKColors.DarkOrange) { StrokeThickness = 3 },
+                GeometryFill = new SolidColorPaint(SKColors.DarkOrange),
+                GeometryStroke = new SolidColorPaint(SKColors.DarkOrange),
                 Fill = new SolidColorPaint(SKColors.Transparent),
                 GeometrySize = 5,
                 XToolTipLabelFormatter = chartPoint => $"GPU: {chartPoint.Label}°C"
@@ -1457,6 +1469,7 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             var percentage = 0;
             var status = "Unknown";
             double timeRemaining = 0;
+            double powerNow = 0;
 
             // Read from cached paths
             if (_systemInfoPaths.ContainsKey("capacity") && File.Exists(_systemInfoPaths["capacity"]))
@@ -1472,9 +1485,11 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             if (_systemInfoPaths.ContainsKey("energy_now") && File.Exists(_systemInfoPaths["energy_now"]) &&
                 _systemInfoPaths.ContainsKey("power_now") && File.Exists(_systemInfoPaths["power_now"]) &&
                 _systemInfoPaths.ContainsKey("energy_full") && File.Exists(_systemInfoPaths["energy_full"]))
+            {
                 if (double.TryParse(File.ReadAllText(_systemInfoPaths["energy_now"]).Trim(), out var energyNow) &&
-                    double.TryParse(File.ReadAllText(_systemInfoPaths["power_now"]).Trim(), out var powerNow) &&
+                    double.TryParse(File.ReadAllText(_systemInfoPaths["power_now"]).Trim(), out powerNow) &&
                     double.TryParse(File.ReadAllText(_systemInfoPaths["energy_full"]).Trim(), out var energyFull))
+                {
                     if (powerNow > 0)
                     {
                         if (status == "Discharging")
@@ -1482,7 +1497,16 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                         else if (status == "Charging")
                             timeRemaining = (energyFull - energyNow) / powerNow;
                     }
-
+                }
+            }
+                
+            if (percentage < 99 && powerNow == 0)
+            {
+                if (status == "Not charging" || status == "Full" || status == "Discharging")
+                {
+                    status = "Charging"; // Override status to "Charging"
+                }
+            }
             return (percentage, status, timeRemaining);
         }
         catch
@@ -1516,6 +1540,24 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
         catch
         {
             return string.Empty;
+        }
+    }
+
+    private string FormatTimeRemain(string status, double timeRemain)
+    {
+        if ((status == "Charging" || status == "Full") && timeRemain == 0)
+        {
+            return "Powered by AC";
+        }
+        else if (status == "Discharging")
+        {
+            var timeSpan = TimeSpan.FromHours(timeRemain);
+            return $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2} left";
+        }
+        else
+        {
+            var timeSpan = TimeSpan.FromHours(timeRemain);
+            return $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2} to full";
         }
     }
 
