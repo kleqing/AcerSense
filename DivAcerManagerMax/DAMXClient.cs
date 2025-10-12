@@ -115,7 +115,11 @@ public class DAMXClient : IDisposable
                 var features = data.GetProperty("available_features");
 
                 _availableFeatures.Clear();
-                foreach (var feature in features.EnumerateArray()) _availableFeatures.Add(feature.GetString());
+                foreach (var feature in features.EnumerateArray())
+                {
+                    var originFeatureName = feature.GetString();
+                    _availableFeatures.Add(FormatFeatureName(originFeatureName));
+                }
 
                 Console.WriteLine($"Available features: {string.Join(", ", _availableFeatures)}");
             }
@@ -483,6 +487,15 @@ public class DAMXClient : IDisposable
         }
 
         _disposed = true;
+    }
+
+    private string FormatFeatureName(string featureName)
+    {
+        if (string.IsNullOrEmpty(featureName))
+            return featureName;
+        
+        string withSpaces = featureName.Replace('_', ' ');
+        return char.ToUpper(withSpaces[0]) + withSpaces.Substring(1);
     }
 }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia;
@@ -16,8 +17,15 @@ namespace DivAcerManagerMax;
 
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
+    private static readonly Dictionary<string, string> _specialFormatText = new()
+    {
+        { "lcd", "LCD" },
+        { "usb", "USB" }
+        // Add other special cases here
+    };
+
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.9.1";
+    private readonly string ProjectVersion = "0.0.1-rc";
 
     // UI Controls (will be bound via NameScope)
     private Button _applyKeyboardColorsButton;
@@ -98,6 +106,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         BindControls();
         AttachEventHandlers();
         InitializeAsync();
+        LoadKeyboardBrighness();
     }
 
     private void BindControls()
@@ -222,7 +231,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var nameScope = this.FindNameScope();
         var thermalProfilePanel = nameScope.Find<Border>("ThermalProfilePanel");
         var fanControlPanel = nameScope.Find<Border>("FanControlPanel");
-        var batteryTab = nameScope.Find<TabItem>("BatteryPanel");
+        var batteryTab = nameScope.Find<TabItem>("PowerPanel");
         var usbChargingPanel = nameScope.Find<Border>("UsbChargingPanel");
         var keyboardLightingTab = nameScope.Find<TabItem>("KeyboardLightingPanel");
         var zoneColorControlPanel = nameScope.Find<Border>("ZoneColorControlPanel");
@@ -500,7 +509,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             _laptopTypeText.Text = _settings.LaptopType;
 
         if (_supportedFeaturesTextBlock != null)
-            _supportedFeaturesTextBlock.Text = string.Join(", ", _settings.AvailableFeatures);
+            _supportedFeaturesTextBlock.Text = string.Join(", ", _settings.AvailableFeatures.Select(FormatFeatureName));
 
         if (_modelNameText != null)
             _modelNameText.Text = GetLinuxLaptopModel();
@@ -804,6 +813,49 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             };
             await _client.SetUsbChargingAsync(level);
         }
+    }
+
+    private void LoadKeyboardBrighness()
+    {
+        var fourZone = "/sys/module/linuwu_sense/drivers/platform:acer-wmi/acer-wmi/four_zoned_kb/per_zone_mode";
+        try
+        {
+            if (File.Exists(fourZone))
+            {
+                var content = File.ReadAllText(fourZone).Trim();
+                var parts = content.Split(',');
+                if (parts.Length > 0)
+                {
+                    var brightnessStr = parts.Last().Trim();
+                    if (int.TryParse(brightnessStr, out var brightness))
+                    {
+                        var slider = this.FindControl<Slider>("KeyBrightnessSlider");
+                        if (slider != null) slider.Value = brightness;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading keyboard brighness: {ex.Message}");
+        }
+    }
+
+    private string FormatFeatureName(string featureName)
+    {
+        if (string.IsNullOrEmpty(featureName))
+            return string.Empty;
+
+        var parts = featureName.Split('_');
+        var formattedParts = new List<string>();
+
+        foreach (var part in parts)
+            if (_specialFormatText.TryGetValue(part, out var format))
+                formattedParts.Add(format);
+            else
+                formattedParts.Add(char.ToUpper(part[0]) + part.Substring(1));
+
+        return string.Join(" ", formattedParts);
     }
 
     public static class AppState

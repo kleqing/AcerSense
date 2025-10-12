@@ -15,6 +15,7 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using LiveChartsCore;
+using LiveChartsCore.Measure;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Avalonia;
 using LiveChartsCore.SkiaSharpView.Painting;
@@ -319,16 +320,15 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
 
             if (modelNameMatch.Success)
             {
-                string fullCpuName = modelNameMatch.Groups[1].Value.Trim();
-                var shortCpuName = Regex.Match(fullCpuName, @"(^(1[1-9]th Gen )?Intel\(R\)\sCore\(TM\)\s[^\s@]+|AMD\sRyzen\s[^\s@]+(\s[^\s@]+)?)");
+                var fullCpuName = modelNameMatch.Groups[1].Value.Trim();
+                var shortCpuName = Regex.Match(fullCpuName,
+                    @"(^(1[1-9]th Gen )?Intel\(R\)\sCore\(TM\)\s[^\s@]+|AMD\sRyzen\s[^\s@]+(\s[^\s@]+)?)");
 
-                if (shortCpuName.Success)
-                {
-                    return shortCpuName.Value.Trim();
-                }
+                if (shortCpuName.Success) return shortCpuName.Value.Trim();
 
                 return fullCpuName.Trim();
             }
+
             return "Unknown CPU";
         }
         catch
@@ -632,24 +632,24 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             new LineSeries<double>
             {
                 Values = _cpuTempHistory,
-                Name = "CPU Temperature",
+                Name = "CPU Temperature:",
                 Stroke = new SolidColorPaint(SKColors.OrangeRed) { StrokeThickness = 3 },
                 GeometryStroke = new SolidColorPaint(SKColors.OrangeRed),
                 GeometryFill = new SolidColorPaint(SKColors.OrangeRed),
                 Fill = new SolidColorPaint(SKColors.Transparent),
                 GeometrySize = 5,
-                XToolTipLabelFormatter = chartPoint => $"CPU: {chartPoint.Label}°C"
+                XToolTipLabelFormatter = chartPoint => $"{GetCpuName()}"
             },
             new LineSeries<double>
             {
                 Values = _gpuTempHistory,
-                Name = "GPU Temperature",
+                Name = "GPU Temperature:",
                 Stroke = new SolidColorPaint(SKColors.DarkOrange) { StrokeThickness = 3 },
                 GeometryFill = new SolidColorPaint(SKColors.DarkOrange),
                 GeometryStroke = new SolidColorPaint(SKColors.DarkOrange),
                 Fill = new SolidColorPaint(SKColors.Transparent),
                 GeometrySize = 5,
-                XToolTipLabelFormatter = chartPoint => $"GPU: {chartPoint.Label}°C"
+                XToolTipLabelFormatter = chartPoint => $"{GetGpuName()}"
             }
         };
 
@@ -672,9 +672,17 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                 {
                     Name = "Temperature (°C)",
                     NamePaint = new SolidColorPaint(SKColors.Gray),
-                    LabelsPaint = new SolidColorPaint(SKColors.Gray)
+                    LabelsPaint = new SolidColorPaint(SKColors.Gray),
+                    MinLimit = 0,
+                    MaxLimit = 100,
+                    TextSize = 13
                 }
             };
+            _temperatureChart.FindingStrategy = FindingStrategy.CompareAll;
+            _temperatureChart.TooltipBackgroundPaint = new SolidColorPaint(SKColor.Parse("#282828").WithAlpha(230));
+            _temperatureChart.TooltipTextPaint = new SolidColorPaint(SKColors.WhiteSmoke);
+            _temperatureChart.TooltipTextSize = 12;
+            _temperatureChart.FontFamily = "Segoe UI";
         }
     }
 
@@ -1485,11 +1493,9 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
             if (_systemInfoPaths.ContainsKey("energy_now") && File.Exists(_systemInfoPaths["energy_now"]) &&
                 _systemInfoPaths.ContainsKey("power_now") && File.Exists(_systemInfoPaths["power_now"]) &&
                 _systemInfoPaths.ContainsKey("energy_full") && File.Exists(_systemInfoPaths["energy_full"]))
-            {
                 if (double.TryParse(File.ReadAllText(_systemInfoPaths["energy_now"]).Trim(), out var energyNow) &&
                     double.TryParse(File.ReadAllText(_systemInfoPaths["power_now"]).Trim(), out powerNow) &&
                     double.TryParse(File.ReadAllText(_systemInfoPaths["energy_full"]).Trim(), out var energyFull))
-                {
                     if (powerNow > 0)
                     {
                         if (status == "Discharging")
@@ -1497,16 +1503,11 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                         else if (status == "Charging")
                             timeRemaining = (energyFull - energyNow) / powerNow;
                     }
-                }
-            }
-                
+
             if (percentage < 99 && powerNow == 0)
-            {
                 if (status == "Not charging" || status == "Full" || status == "Discharging")
-                {
                     status = "Charging"; // Override status to "Charging"
-                }
-            }
+
             return (percentage, status, timeRemaining);
         }
         catch
@@ -1545,11 +1546,9 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
 
     private string FormatTimeRemain(string status, double timeRemain)
     {
-        if ((status == "Charging" || status == "Full") && timeRemain == 0)
-        {
-            return "Powered by AC";
-        }
-        else if (status == "Discharging")
+        if ((status == "Charging" || status == "Full") && timeRemain == 0) return "Powered by AC";
+
+        if (status == "Discharging")
         {
             var timeSpan = TimeSpan.FromHours(timeRemain);
             return $"{timeSpan.Hours:D2}:{timeSpan.Minutes:D2} left";
