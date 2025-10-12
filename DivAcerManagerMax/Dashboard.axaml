@@ -30,7 +30,7 @@
                 <StackPanel>
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock x:Name="CpuTitle" Grid.Column="0" Text="CPU" Classes="SubHeader" />
-                        <material:MaterialIcon Grid.Column="1" Kind="Cpu64Bit" Width="24" Height="24"
+                        <material:MaterialIcon Grid.Column="1" Kind="Memory" Width="24" Height="24"
                                                HorizontalAlignment="Right" />
                     </Grid>
 
@@ -42,25 +42,39 @@
                     </StackPanel>
 
                     <DockPanel LastChildFill="True" Margin="0,7,0,0" VerticalAlignment="Center">
-                        <TextBlock DockPanel.Dock="Left" Text="Temperature:" Opacity="0.7" Width="90"
-                                   VerticalAlignment="Center" />
-                        <StackPanel DockPanel.Dock="Right">
-                            <TextBlock x:Name="CpuTemperature" Text="{Binding CpuTemp, StringFormat='{}{0}°C'}"
-                                       FontWeight="SemiBold" Width="50" VerticalAlignment="Center" />
-                            <ProgressBar x:Name="CpuTemperatureBar" Value="{Binding CpuTemp}" Maximum="110"
-                                         MinWidth="10" MaxWidth="Infinity" Margin="0" VerticalAlignment="Center" />
-                        </StackPanel>
+                        <Grid DockPanel.Dock="Right" VerticalAlignment="Center" ColumnDefinitions="*, Auto"
+                              RowDefinitions="Auto, Auto">
+
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="CPU Temperature:" Opacity="0.7"
+                                       VerticalAlignment="Bottom" />
+
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding CpuTemp, StringFormat='{}{0}°C'}"
+                                       FontWeight="SemiBold"
+                                       Width="50"
+                                       VerticalAlignment="Bottom"
+                                       HorizontalAlignment="Right" />
+
+                            <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Value="{Binding CpuTemp}" Maximum="110"
+                                         MinWidth="10" MaxWidth="Infinity" Margin="4, 5, 0, 0" />
+                        </Grid>
                     </DockPanel>
 
                     <DockPanel LastChildFill="True" Margin="0,7,0,0" VerticalAlignment="Center">
-                        <TextBlock DockPanel.Dock="Left" Text="Usage:" Opacity="0.7" Width="90"
-                                   VerticalAlignment="Center" />
-                        <StackPanel DockPanel.Dock="Right">
-                            <TextBlock Text="{Binding CpuUsage, StringFormat='{}{0}%'}" FontWeight="SemiBold"
-                                       Width="50" VerticalAlignment="Center" />
-                            <ProgressBar Value="{Binding CpuUsage}" Maximum="100" MinWidth="10" MaxWidth="Infinity"
-                                         Margin="0" VerticalAlignment="Center" />
-                        </StackPanel>
+                        <Grid DockPanel.Dock="Right" VerticalAlignment="Center" ColumnDefinitions="*, Auto"
+                              RowDefinitions="Auto, Auto">
+
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="CPU Usage:" Opacity="0.7"
+                                       VerticalAlignment="Bottom" />
+
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding CpuUsage, StringFormat='{}{0}%'}"
+                                       FontWeight="SemiBold"
+                                       Width="50"
+                                       VerticalAlignment="Bottom"
+                                       HorizontalAlignment="Right" />
+
+                            <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Value="{Binding CpuUsage}" Maximum="110"
+                                         MinWidth="10" MaxWidth="Infinity" Margin="4, 5, 0, 0" />
+                        </Grid>
                     </DockPanel>
                 </StackPanel>
             </Border>
@@ -82,30 +96,44 @@
                     </StackPanel>
 
                     <DockPanel LastChildFill="True" Margin="0,2" VerticalAlignment="Center">
-                        <TextBlock DockPanel.Dock="Left" Text="Temperature:" Opacity="0.7" Width="90"
-                                   VerticalAlignment="Center" />
-                        <StackPanel DockPanel.Dock="Right">
-                            <TextBlock x:Name="GpuTemperature" Text="{Binding GpuTemp, StringFormat='{}{0}°C'}"
-                                       FontWeight="SemiBold" Width="50" VerticalAlignment="Center" />
-                            <ProgressBar x:Name="GpuTemperatureBar" Value="{Binding GpuTemp}" Maximum="110"
-                                         MinWidth="10" MaxWidth="Infinity" Margin="0" VerticalAlignment="Center" />
-                        </StackPanel>
+                        <Grid DockPanel.Dock="Right" VerticalAlignment="Center" ColumnDefinitions="*, Auto"
+                              RowDefinitions="Auto, Auto">
+
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="GPU Temperature:" Opacity="0.7"
+                                       VerticalAlignment="Bottom" />
+
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding GpuTemp, StringFormat='{}{0}°C'}"
+                                       FontWeight="SemiBold"
+                                       Width="50"
+                                       VerticalAlignment="Bottom"
+                                       HorizontalAlignment="Right" />
+
+                            <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Value="{Binding GpuTemp}" Maximum="110"
+                                         MinWidth="10" MaxWidth="Infinity" Margin="4, 5, 0, 0" />
+                        </Grid>
                     </DockPanel>
 
                     <DockPanel LastChildFill="True" Margin="0,2" VerticalAlignment="Center">
-                        <TextBlock DockPanel.Dock="Left" Text="Usage:" Opacity="0.7" Width="90"
-                                   VerticalAlignment="Center" />
-                        <StackPanel DockPanel.Dock="Right">
-                            <TextBlock Text="{Binding GpuUsage, StringFormat='{}{0}%'}" FontWeight="SemiBold"
-                                       Width="50" VerticalAlignment="Center" />
-                            <ProgressBar Value="{Binding GpuUsage}" Maximum="100" MinWidth="10" MaxWidth="Infinity"
-                                         Margin="0" VerticalAlignment="Center" />
-                        </StackPanel>
+                        <Grid DockPanel.Dock="Right" VerticalAlignment="Center" ColumnDefinitions="*, Auto"
+                              RowDefinitions="Auto, Auto">
+
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="GPU Usage:" Opacity="0.7"
+                                       VerticalAlignment="Bottom" />
+
+                            <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding GpuUsage, StringFormat='{}{0}%'}"
+                                       FontWeight="SemiBold"
+                                       Width="50"
+                                       VerticalAlignment="Bottom"
+                                       HorizontalAlignment="Right" />
+
+                            <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Value="{Binding GpuUsage}" Maximum="110"
+                                         MinWidth="10" MaxWidth="Infinity" Margin="4, 5, 0, 0" />
+                        </Grid>
                     </DockPanel>
 
 
-                    <DockPanel LastChildFill="True" Margin="0,2" VerticalAlignment="Center">
-                        <TextBlock DockPanel.Dock="Left" Text="Driver:" Opacity="0.7" Width="90"
+                    <DockPanel LastChildFill="True" Margin="0,5, 0, 0" VerticalAlignment="Center">
+                        <TextBlock DockPanel.Dock="Left" Text="Driver Version:" Opacity="0.7" Width="110"
                                    VerticalAlignment="Center" />
                         <TextBlock x:Name="GpuDriver" Text="UNKNOWN" FontWeight="SemiBold" VerticalAlignment="Center" />
                     </DockPanel>
@@ -122,26 +150,25 @@
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="10">
-                        <StackPanel HorizontalAlignment="Center">
-                            <TextBlock Text="CPU Fan:" Opacity="0.7" Width="90" VerticalAlignment="Center" />
-                            <TextBlock x:Name="CpuFanSpeed" Text="2400 RPM" FontWeight="SemiBold"
-                                       VerticalAlignment="Center" />
+                        <Grid RowDefinitions="Auto, Auto, Auto" HorizontalAlignment="Center">
+                            <TextBlock Grid.Row="0" Text="CPU Fan" Opacity="0.7" HorizontalAlignment="Center" />
+                            <TextBlock Grid.Row="1" x:Name="CpuFanSpeed" Text="2400 RPM" FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
                             <!-- CPU Fan Animation -->
-                            <material:MaterialIcon x:Name="CpuFanIcon" Classes="FanIcon" Kind="Fan" Width="64"
-                                                   Height="64"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <material:MaterialIcon Grid.Row="2" x:Name="CpuFanIcon" Classes="FanIcon" Kind="Fan"
+                                                   Width="64" Height="64" HorizontalAlignment="Center"
+                                                   Margin="0, 5, 0, 0" />
+                        </Grid>
 
-
-                        </StackPanel>
-
-                        <StackPanel>
-                            <TextBlock Text="GPU Fan:" Opacity="0.7" Width="90" VerticalAlignment="Center" />
-                            <TextBlock x:Name="GpuFanSpeed" Text="3100 RPM" FontWeight="SemiBold"
-                                       VerticalAlignment="Center" />
-                            <material:MaterialIcon x:Name="GpuFanIcon" Classes="FanIcon" Kind="Fan" Width="64"
-                                                   Height="64"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </StackPanel>
+                        <Grid RowDefinitions="Auto, Auto, Auto" HorizontalAlignment="Center" Margin="30, 0, 0, 0">
+                            <TextBlock Grid.Row="0" Text="GPU Fan" Opacity="0.7" HorizontalAlignment="Center" />
+                            <TextBlock Grid.Row="1" x:Name="GpuFanSpeed" Text="2400 RPM" FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+                            <!-- GPU Fan Animation -->
+                            <material:MaterialIcon Grid.Row="2" x:Name="GpuFanIcon" Classes="FanIcon" Kind="Fan"
+                                                   Width="64" Height="64" HorizontalAlignment="Center"
+                                                   Margin="0, 5, 0, 0" />
+                        </Grid>
                     </StackPanel>
 
                     <DockPanel LastChildFill="False" Margin="0,2" VerticalAlignment="Center" IsVisible="False">
@@ -185,7 +212,7 @@
                         <TextBlock x:Name="BatteryPercentage"
                                    Text="{Binding BatteryPercentageInt , StringFormat='{}{0}%'}"
                                    FontFamily="{StaticResource OxaniumBoldFont}" FontStretch="ExtraExpanded"
-                                   FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5,0,0" />
+                                   FontSize="28" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0" />
                     </StackPanel>
 
                     <DockPanel LastChildFill="True" Margin="0,20,0,10" VerticalAlignment="Center">

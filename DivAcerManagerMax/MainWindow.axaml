@@ -13,10 +13,9 @@
         SystemDecorations="Full"
         Background="#0e0e11"
 
-        Width="1280" Height="820"
+        Width="1280" Height="780"
         MinWidth="1280" MinHeight="520">
-
-
+    
     <Grid>
 
         <Grid RowDefinitions="Auto,*">
@@ -30,7 +29,7 @@
 
                     <TextBlock Text="" FontSize="26" FontWeight="Bold"
                                LetterSpacing="4" VerticalAlignment="Bottom"
-                               HorizontalAlignment="Right" Margin="0 0 20 0" 
+                               HorizontalAlignment="Right" Margin="0 0 20 0"
                                FontFamily="{StaticResource OxaniumBoldFont}">
                         <TextBlock.Foreground>
 
@@ -50,17 +49,22 @@
             <TabControl Grid.Row="1" Margin="10,0,10,10" CornerRadius="20" Background="#18181b" BorderBrush="#18181b"
                         BorderThickness="5" TabStripPlacement="Left">
 
-                <TabItem Header="Dashboard">
-
+                <TabItem Margin="0, 10, 0, 0">
+                    <TabItem.Header>
+                        <TextBlock Text="Dashboard" VerticalAlignment="Center" FontSize="17" Padding="0, 0, 0, 4" />
+                    </TabItem.Header>
                     <views:Dashboard />
-
                 </TabItem>
 
-                <!-- Power & Performance Tab -->
-                <TabItem Header="Power &amp; Performance">
+                <!-- Fan & Performance Tab -->
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="Fans &amp; Performance" VerticalAlignment="Center" FontSize="17"
+                                   Padding="0, 0, 0, 4" />
+                    </TabItem.Header>
                     <ScrollViewer>
                         <StackPanel Margin="10,0,20,0">
-                            <TextBlock Text="Power &amp; Performance" Classes="SectionHeader" />
+                            <TextBlock Text="Fans &amp; Performance" Classes="SectionHeader" />
 
                             <Border Classes="Card" x:Name="ThermalProfilePanel">
                                 <StackPanel>
@@ -214,7 +218,10 @@
                 </TabItem>
 
                 <!-- Power Controls Tab -->
-                <TabItem Header="Battery Controls" x:Name="BatteryPanel">
+                <TabItem x:Name="PowerPanel">
+                    <TabItem.Header>
+                        <TextBlock Text="Power Controls" VerticalAlignment="Center" FontSize="17" Padding="0, 0, 0, 4" />
+                    </TabItem.Header>
                     <ScrollViewer>
                         <StackPanel Margin="10,0,20,0">
                             <TextBlock Text="Power Controls" Classes="SectionHeader" />
@@ -235,7 +242,8 @@
                                                 Text="Battery calibration will fully charge, drain, and recharge your battery."
                                                 TextWrapping="Wrap" Margin="0 5 0 0" Opacity="0.7" />
                                             <TextBlock Text="Do not unplug AC power during calibration."
-                                                       Foreground="#FFA500" Margin="0 5 0 0" />
+                                                       Foreground="#FFA500" Margin="0 5 0 0" FontStyle="Italic"
+                                                       TextWrapping="Wrap" FontSize="12" />
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="1" Orientation="Vertical">
@@ -290,15 +298,20 @@
                 </TabItem>
 
                 <!-- Keyboard Lighting Tab -->
-                <TabItem Header="Keyboard Lighting" x:Name="KeyboardLightingPanel">
+                <TabItem x:Name="KeyboardLightingPanel">
+                    <TabItem.Header>
+                        <TextBlock Text="Keyboard Lighting" VerticalAlignment="Center" FontSize="17"
+                                   Padding="0, 0, 0, 4" />
+                    </TabItem.Header>
                     <ScrollViewer>
                         <StackPanel Margin="10,0,20,0">
                             <TextBlock Text="Keyboard Lighting" Classes="SectionHeader" />
-                            <TextBlock Text="This Section Requires Testing." Foreground="#FFA500" Margin="0 0 0 10" />
+                            <TextBlock Text="This Section Requires Testing." Foreground="#FFA500" Margin="0 0 0 10"
+                                       FontSize="12" FontStyle="Italic"
+                                       TextWrapping="Wrap" />
 
                             <!-- Zone Color Control -->
-
-
+                            
                             <Border Classes="Card" x:Name="ZoneColorControlPanel">
                                 <StackPanel>
                                     <TextBlock Text="Zone Color Control" Classes="SubHeader" />
@@ -315,8 +328,7 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-
-
+                                        
                                         <!-- Zone 1 -->
                                         <Grid Grid.Column="0" Grid.Row="0" Margin="10,10" VerticalAlignment="Center">
                                             <Grid.ColumnDefinitions>
@@ -333,13 +345,12 @@
                                                              IsAlphaEnabled="False"
                                                              IsAlphaVisible="False"
                                                              Color="#4287f5"
-
                                                              VerticalAlignment="Center"
                                                              HorizontalAlignment="Left"
                                                              Height="50"
                                                              Width="200" />
-
                                             </StackPanel>
+                                            
                                         </Grid>
 
                                         <!-- Zone 2 -->
@@ -362,7 +373,7 @@
                                                              Height="50"
                                                              Width="200" />
                                             </StackPanel>
-
+                                            
                                         </Grid>
 
                                         <!-- Zone 3 -->
@@ -421,15 +432,25 @@
                                                        Margin="0 0 10 0" />
                                             <Slider x:Name="KeyBrightnessSlider" Grid.Column="1" Value="100"
                                                     Margin="0 0 10 0" />
-                                            <TextBlock x:Name="KeyBrightnessText" Grid.Column="2" Text="100%"
+                                            <TextBlock x:Name="KeyBrightnessText" Grid.Column="2"
+                                                       Text="{Binding #KeyBrightnessSlider.Value, StringFormat='{}{0:F0}%'}"
                                                        VerticalAlignment="Center" />
                                         </Grid>
+                                        
                                     </Grid>
 
+                                    <TextBlock
+                                        Text="Note: Value of the brightness slider may not be accurate if changed using keyboard function keys!"
+                                        FontSize="13"
+                                        Opacity="0.7"
+                                        FontStyle="Italic"
+                                        TextWrapping="Wrap"
+                                        Margin="0,0,0,5" />
 
                                     <Button x:Name="ApplyKeyboardColorsButton" Content="Apply Zone Colors"
                                             Margin="0 15 0 0" />
                                 </StackPanel>
+                                
                             </Border>
 
                             <!-- Lighting Effects -->
@@ -509,13 +530,16 @@
                                               Margin="0 10" />
                                 </StackPanel>
                             </Border>
-
+                            
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
 
                 <!-- System Settings Tab -->
-                <TabItem Header="System Settings" x:Name="SystemSettingsPanel">
+                <TabItem x:Name="SystemSettingsPanel">
+                    <TabItem.Header>
+                        <TextBlock Text="System Settings" VerticalAlignment="Center" FontSize="17" Padding="0, 0, 0, 4" />
+                    </TabItem.Header>
                     <ScrollViewer>
                         <StackPanel Margin="10,0,20,0">
                             <TextBlock Text="System Settings" Classes="SectionHeader" />
@@ -530,7 +554,9 @@
                                     <CheckBox x:Name="LcdOverrideCheckBox" Content="Enable LCD Override"
                                               IsChecked="True" Margin="0 10" />
                                     <TextBlock Text="Note: May increase battery consumption" Foreground="#FFA500"
-                                               FontSize="12" Margin="0 5" />
+                                               FontSize="12" Margin="0 5"
+                                               FontStyle="Italic"
+                                               TextWrapping="Wrap" />
                                 </StackPanel>
                             </Border>
 
@@ -554,36 +580,35 @@
                                     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
                                           Margin="0 10">
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Model:" FontWeight="SemiBold"
-                                                   Width="120" Margin="0 10 0 0" />
+                                                   Width="150" Margin="0 10 0 0" />
                                         <TextBlock x:Name="ModelNameText" Grid.Row="0" Grid.Column="1" Text="UNKNOWN"
                                                    Margin="5 10 0 0" />
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Laptop Type:"
-                                                   FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
+                                                   FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
                                         <TextBlock x:Name="LaptopTypeText" Grid.Row="1" Grid.Column="1" Text="UNKNOWN"
                                                    Margin="5 10 0 0" />
 
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Features:" FontWeight="SemiBold"
-                                                   Width="120" Margin="0 10 0 0" />
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Supported Features:" FontWeight="SemiBold"
+                                                   Width="150" Margin="0 10 0 0" />
                                         <TextBlock x:Name="SupportedFeaturesTextBlock" Grid.Row="2" Grid.Column="1"
                                                    Text="UNKNOWN" Margin="5 10 0 0" TextWrapping="Wrap" />
 
                                         <TextBlock Grid.Row="5" Grid.Column="0" Text="Project Version:"
-                                                   FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
+                                                   FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
                                         <TextBlock x:Name="ProjectVersionText" Grid.Row="5" Grid.Column="1"
                                                    Text="UNKNOWN" Margin="5 10 0 0" />
 
 
                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Daemon Version:"
-                                                   FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
+                                                   FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
                                         <TextBlock x:Name="DaemonVersionText" Grid.Row="3" Grid.Column="1"
                                                    Text="UNKNOWN" Margin="5 10 0 0" />
 
                                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Driver Version:"
-                                                   FontWeight="SemiBold" Width="120" Margin="0 10 0 0" />
+                                                   FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
                                         <TextBlock x:Name="DriverVersionText" Grid.Row="4" Grid.Column="1"
                                                    Text="UNKNOWN" Margin="5 10 0 0" />
-
                                     </Grid>
 
                                     <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Stretch">
@@ -597,8 +622,6 @@
                                         <Button x:Name="InternalsManagerButton" Content="Internals Manager"
                                                 Margin="0 15 0 0"
                                                 Click="InternalsMangerWindow_OnClick" />
-
-
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
