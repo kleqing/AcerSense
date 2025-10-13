@@ -14,7 +14,7 @@ AcerSense is primarily built for modern Acer laptops (2019 and newer) that use W
 > You can find original compatibility list at [here](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/Compatibility.md). This is the modified version to matched with my [Linuwu-Sense](https://github.com/kleqing/Linuwu-Sense/tree/main).
 >
 
-Please also check out the [FAQ Page](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/FAQ.md) to know how to get your model to work even though it's not supported, and you can even help others by creating a quirk config and for your model and creating a merge request. 
+Please also check out the [FAQ Page](https://github.com/kleqing/AcerSense/blob/main/FAQ.md) to know how to get your model to work even though it's not supported, and you can even help others by creating a quirk config and for your model and creating a merge request. 
 
 If your model is supported without quirk, you can create a [PRs](https://github.com/kleqing/AcerSense/pulls) to help others known that the model is compatible with AcerSense. If your model is not supported even after install the Linuwu-Sense. You can read [this page](https://github.com/kleqing/Acer-Sense?tab=readme-ov-file#-i-want-to-add-support-for-my-own-model-) to learn how to create a dmi quirk for your model.
 
