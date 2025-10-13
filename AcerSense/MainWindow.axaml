@@ -667,7 +667,7 @@
                                    Margin="0,12,0,0" />
 
                         <TextBlock
-                            Text="Daemon may be initializing. Please wait a minute. If issues persists, check logs."
+                            Text="Daemon may be initializing. Please wait a minute. If issues persists, please check logs."
                             Foreground="White"
                             FontSize="13"
                             TextWrapping="Wrap"
