@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DivAcerManagerMax", "DivAcerManagerMax\DivAcerManagerMax.csproj", "{65E38837-DBA8-4C80-B2DE-A87CE05993AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcerSense", "AcerSense\AcerSense.csproj", "{65E38837-DBA8-4C80-B2DE-A87CE05993AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,16 +6,16 @@
 
     <Application.Resources>
         <!-- Oxanium Regular -->
-        <FontFamily x:Key="OxaniumFont">avares://DivAcerManagerMax/Assets/Fonts/Oxanium.ttf#Oxanium</FontFamily>
+        <FontFamily x:Key="OxaniumFont">avares://AcerSense/Assets/Fonts/Oxanium.ttf#Oxanium</FontFamily>
 
         <!-- Oxanium Bold (same internal name) -->
-        <FontFamily x:Key="OxaniumBoldFont">avares://DivAcerManagerMax/Assets/Fonts/Oxanium-Bold.ttf#Oxanium</FontFamily>
+        <FontFamily x:Key="OxaniumBoldFont">avares://AcerSense/Assets/Fonts/Oxanium-Bold.ttf#Oxanium</FontFamily>
 
         <!-- Open Sans Regular -->
-        <FontFamily x:Key="OpenSansFont">avares://DivAcerManagerMax/Assets/Fonts/OpenSans.ttf#Open Sans</FontFamily>
+        <FontFamily x:Key="OpenSansFont">avares://AcerSense/Assets/Fonts/OpenSans.ttf#Open Sans</FontFamily>
 
         <!-- Open Sans SemiBold -->
-        <FontFamily x:Key="OpenSansSemiBoldFont">avares://DivAcerManagerMax/Assets/Fonts/OpenSans-SemiBold.ttf#Open Sans SemiBold</FontFamily>
+        <FontFamily x:Key="OpenSansSemiBoldFont">avares://AcerSense/Assets/Fonts/OpenSans-SemiBold.ttf#Open Sans SemiBold</FontFamily>
 
 
     </Application.Resources>

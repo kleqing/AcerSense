@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 namespace DivAcerManagerMax;
 
 /// <summary>
-///     Client for communicating with the DAMX-Daemon over Unix socket
+///     Client for communicating with the Daemon over Unix socket
 /// </summary>
-public class DAMXClient : IDisposable
+public class AcerSense : IDisposable
 {
     private const string SocketPath = "/var/run/DAMX.sock";
 
     /// <summary>
-    ///     Send a command to the DAMX-Daemon and receive response
+    ///     Send a command to the Daemon and receive response
     /// </summary>
     /// <param name="command">Command name</param>
     /// <param name="parameters">Optional parameters</param>
@@ -32,7 +32,7 @@ public class DAMXClient : IDisposable
     private bool _disposed;
     private Socket _socket;
 
-    public DAMXClient()
+    public AcerSense()
     {
         IsConnected = false;
     }
@@ -212,7 +212,7 @@ public class DAMXClient : IDisposable
     ///     Get all settings from the DAMX-Daemon
     /// </summary>
     /// <returns>All settings as a JsonDocument</returns>
-    public async Task<DAMXSettings> GetAllSettingsAsync()
+    public async Task<AcerSenseSettings> GetAllSettingsAsync()
     {
         var response = await SendCommandAsync("get_all_settings");
         var success = response.RootElement.GetProperty("success").GetBoolean();
@@ -220,7 +220,7 @@ public class DAMXClient : IDisposable
         if (success)
         {
             var data = response.RootElement.GetProperty("data");
-            var settings = JsonSerializer.Deserialize<DAMXSettings>(data.GetRawText());
+            var settings = JsonSerializer.Deserialize<AcerSenseSettings>(data.GetRawText());
 
             // Update available features cache
             if (settings.AvailableFeatures != null)
@@ -493,16 +493,16 @@ public class DAMXClient : IDisposable
     {
         if (string.IsNullOrEmpty(featureName))
             return featureName;
-        
-        string withSpaces = featureName.Replace('_', ' ');
+
+        var withSpaces = featureName.Replace('_', ' ');
         return char.ToUpper(withSpaces[0]) + withSpaces.Substring(1);
     }
 }
 
 /// <summary>
-///     Models for DAMX settings
+///     Models for AcerSense settings
 /// </summary>
-public class DAMXSettings
+public class AcerSenseSettings
 {
     [JsonPropertyName("laptop_type")] public string LaptopType { get; set; } = "UNKNOWN";
 

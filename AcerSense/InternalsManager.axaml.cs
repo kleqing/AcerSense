@@ -37,7 +37,7 @@ public partial class InternalsManager : Window
         _mainWindow.EnableDevMode(DevModeToggleSwitch.IsChecked == true);
     }
 
-    public void ReinitializeDamxGUI()
+    public void ReinitializeAcerSenseGUI()
     {
         _mainWindow.InitializeAsync();
     }
@@ -54,7 +54,7 @@ public partial class InternalsManager : Window
         Console.WriteLine("Restart suite command sent");
         await Task.Delay(1000);
 
-        ReinitializeDamxGUI();
+        ReinitializeAcerSenseGUI();
 
         ShowMessagebox("Restarting Suite", "Restarting Suite and refreshing GUI, please wait");
     }
@@ -65,7 +65,7 @@ public partial class InternalsManager : Window
         if (_mainWindow._client.IsConnected) _mainWindow._client.SendCommandAsync("force_predator_model");
         Console.WriteLine("Force Predator Model Command Sent");
         await Task.Delay(1000);
-        ReinitializeDamxGUI();
+        ReinitializeAcerSenseGUI();
         ShowMessagebox("Forcing Predator Model",
             "Restarting Drivers with predator_v4 parameter with daemon and refreshing GUI, please wait");
     }
@@ -77,7 +77,7 @@ public partial class InternalsManager : Window
         await Task.Delay(1000);
         ShowMessagebox("Forcing Nitro Model",
             "Restarting Drivers with nitro_v4 parameter with daemon and refreshing GUI, please wait");
-        ReinitializeDamxGUI();
+        ReinitializeAcerSenseGUI();
     }
 
 
@@ -87,7 +87,7 @@ public partial class InternalsManager : Window
         Console.WriteLine("restart_daemon Command Sent");
 
         await Task.Delay(1000);
-        ReinitializeDamxGUI();
+        ReinitializeAcerSenseGUI();
 
         ShowMessagebox("Restarting Daemon",
             "Restarting Daemon refreshing GUI, please wait");
@@ -109,7 +109,7 @@ public partial class InternalsManager : Window
         await Task.Delay(1000);
         ShowMessagebox("Forcing All Features",
             "Initializing Drivers with enable_all parameter. Restarting daemon and refreshing GUI, please wait");
-        ReinitializeDamxGUI();
+        ReinitializeAcerSenseGUI();
     }
 
     private void ForceParameterPermanently_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
