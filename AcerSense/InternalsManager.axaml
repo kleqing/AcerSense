@@ -2,32 +2,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DivAcerManagerMax.InternalsManager"
         Width="600" Height="700"
-        Title="DAMX Internals Manager"
-        Icon="iconTransparent.png"
+        Title="Internals Manager"
+        Icon="icon.png"
         WindowStartupLocation="CenterOwner"
         Background="#0e0e11">
 
     <Grid>
         <Grid RowDefinitions="Auto,*">
 
-            <!-- Header -->
-            <Border Grid.Row="0" Padding="0 10 0 10">
-                <TextBlock Text="Internals Manager" FontSize="22" FontWeight="Bold"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                           FontFamily="{StaticResource OxaniumBoldFont}">
-                    <TextBlock.Foreground>
-                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%, 100%">
-                            <GradientStop Offset="0" Color="#72bff4" />
-                            <GradientStop Offset="1" Color="#3678c3" />
-                        </LinearGradientBrush>
-                    </TextBlock.Foreground>
-                </TextBlock>
-            </Border>
-
             <!-- Main Content -->
-            <ScrollViewer Grid.Row="1" Margin="15,0,15,15">
+            <ScrollViewer Grid.Row="1" Margin="15, 20, 15, 15" HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Hidden">
                 <StackPanel>
-
                     <!-- Developer Mode -->
                     <Border Classes="Card" Margin="0,0,0,15">
                         <StackPanel>
@@ -40,6 +26,10 @@
                             </Grid>
                             <TextBlock Text="Enable advanced controls and feature overrides"
                                        Opacity="0.7" Margin="0,5,0,0" />
+
+                            <TextBlock Text="This feature will automatically disable after the application restart!"
+                                       Opacity="0.5" HorizontalAlignment="Left"
+                                       TextAlignment="Center" FontSize="11" />
                         </StackPanel>
                     </Border>
 
