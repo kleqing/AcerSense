@@ -678,7 +678,7 @@ public partial class Dashboard : UserControl, INotifyPropertyChanged
                     TextSize = 13
                 }
             };
-            _temperatureChart.FindingStrategy = FindingStrategy.CompareAll;
+            _temperatureChart.FindingStrategy = FindingStrategy.ExactMatchTakeClosest;
             _temperatureChart.TooltipBackgroundPaint = new SolidColorPaint(SKColor.Parse("#282828").WithAlpha(230));
             _temperatureChart.TooltipTextPaint = new SolidColorPaint(SKColors.WhiteSmoke);
             _temperatureChart.TooltipTextSize = 12;
