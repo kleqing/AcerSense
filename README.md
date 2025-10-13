@@ -1,11 +1,14 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/kleqing/AcerSense/refs/heads/main/AcerSense/icon.png" alt="icon" width="80" style="vertical-align: middle;">
+  <img src="https://raw.githubusercontent.com/kleqing/AcerSense/refs/heads/main/AcerSense/icon.png" alt="icon" width="80" style="vertical-align: middle;">
 </p>
 
 <h1 align="center">
   AcerSense
+  AcerSense
 </h1>
 
+**AcerSense** is the ***reworked*** version of the original [DAMX](https://github.com/PXDiv/Div-Acer-Manager-Max) by PXDiv, which is a Linux GUI for Acer laptops using Linuwu Sense drivers — all wrapped in a modern Avalonia-based UI. This is a replicates of NitroSense and PredatorSense but for Linux!
 **AcerSense** is the ***reworked*** version of the original [DAMX](https://github.com/PXDiv/Div-Acer-Manager-Max) by PXDiv, which is a Linux GUI for Acer laptops using Linuwu Sense drivers — all wrapped in a modern Avalonia-based UI. This is a replicates of NitroSense and PredatorSense but for Linux!
 
 > [!CAUTION]
@@ -13,10 +16,15 @@
 
 ![Image]()
 
-
+<h4 align="center" style="font-style: italic">
+ This is the fork version of <a href="https://github.com/PXDiv/Div-Acer-Manager-Max">DAMX</a> with better UI
 <h4 align="center" style="font-style: italic">
  This is the fork version of <a href="https://github.com/PXDiv/Div-Acer-Manager-Max">DAMX</a> with better UI
 </h4>  
+
+## ❓ Why "Rework"
+
+- Uh,... It is just my sudden inspiration. After finding a lot of 'NitroSense for Linux' in the internet, I found that every tools/drivers are not supported for my model. Even I edited the [linuwu_sense](https://github.com/0x7375646F/Linuwu-Sense/blob/main/src/linuwu_sense.c) to make the DMI matched with my device, Linuwu Sense still not supported my device. After read the README, I found that a GUI tool called DAMX that can supported my device by edit the modified version of [linuwu_sense](https://github.com/PXDiv/Div-Linuwu-Sense) (PXDiv). But the UI is too bad for me so I fork his project and modify a bit.
 
 ## ❓ Why "Rework"
 
@@ -33,7 +41,18 @@
 - 🌡 **Fan Control**
   - Manual and auto fan speed modes
   - Manual disabled automatically when in Quiet profile
+***All the original features of the DAMX are still here. My version is just modify the UI to make it look better!***
 
+- 🔋 **Performance / Thermal Profiles**
+  - Eco, Silent, Balanced, Performance, Turbo — automatically adjusted based on AC/battery status
+  (e.g., Turbo hidden when on battery or unsupported). **Only Nitro V (not 5) and Predator has this feature**
+
+- 🌡 **Fan Control**
+  - Manual and auto fan speed modes
+  - Manual disabled automatically when in Quiet profile
+
+- 💡 **LCD Override Setting**
+  - Direct control over LCD power behavior
 - 💡 **LCD Override Setting**
   - Direct control over LCD power behavior
 
@@ -43,10 +62,24 @@
 
 - 🔊 **Boot Animation and Sound Toggle**
   - Enable/disable Acer's startup animations and sounds
+- 🎨 **Keyboard Backlight Control**
+  - Customize the keyboard backlight timeout
+  - Auto set keyboard backlight brightness slider based on the [acer-wmi](https://github.com/torvalds/linux/blob/master/drivers/platform/x86/acer-wmi.c) output
+
+- 🔊 **Boot Animation and Sound Toggle**
+  - Enable/disable Acer's startup animations and sounds
 
 - 💻 **Live System Info Display**
   - Shows real-time performance profile, fan settings, calibration state, and more
+- 💻 **Live System Info Display**
+  - Shows real-time performance profile, fan settings, calibration state, and more
 
+- 🧠 **Smart Daemon (Low Resource Use)**
+  - Auto-detects feature support per device
+  - Communicates with GUI in real-time
+  - Lightweight: consume less RAM
+  - Can run **independently** of GUI
+  - Recursive restart to fix software issues similar to those on Windows
 - 🧠 **Smart Daemon (Low Resource Use)**
   - Auto-detects feature support per device
   - Communicates with GUI in real-time
@@ -59,10 +92,17 @@
   - Realtime Monitoring with Dashboard and accurate Tempreature Readings
   - Dynamic UI hides unsupported features
   - Real-time feedback from daemon
+- 🖥️ **Modern GUI**
+  - Avalonia-based, clean and responsive
+  - Realtime Monitoring with Dashboard and accurate Tempreature Readings
+  - Dynamic UI hides unsupported features
+  - Real-time feedback from daemon
 
 ## 🧭 Compatibilty
 Please check the compatibility at here: [Compatibility List](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/Compatibility.md)
+Please check the compatibility at here: [Compatibility List](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/Compatibility.md)
 
+> Note that the compatibility list may be out date if using this version because it comes with my custom linuwu-sense driver, not from the author!
 > Note that the compatibility list may be out date if using this version because it comes with my custom linuwu-sense driver, not from the author!
 
 ## 🖥️ DAMX Installation Guide
@@ -80,6 +120,7 @@ Please check the compatibility at here: [Compatibility List](https://github.com/
 4. Run the script:
 
    - Right-click the setup file and choose **“Run in Terminal”**,
+   - Right-click the setup file and choose **“Run in Terminal”**,
      or open a terminal in the folder and run:
 
      ```bash
@@ -88,6 +129,12 @@ Please check the compatibility at here: [Compatibility List](https://github.com/
 
 5. When prompted, choose an option from the menu:
 
+   - `1` → Install
+   - `2` → Install without drivers
+   - `3` → Uninstall
+   - `4` → Reinstall/Update
+   - `5` → Check services status
+   - `q` → Quit
    - `1` → Install
    - `2` → Install without drivers
    - `3` → Uninstall
@@ -104,6 +151,12 @@ Known issues: [Increase backlight keyboard](https://github.com/kleqing/Linuwu-Se
 
 You can also check the logs at /var/log/DAMX_Daemon_Log.log
 
+Known issues: [Increase backlight keyboard](https://github.com/kleqing/Linuwu-Sense#%EF%B8%8F-known-issue-fn--f10-keyboard-backlight-key)
+
+
+You can also check the logs at /var/log/DAMX_Daemon_Log.log
+
+If you get UNKNOWN as Laptop type, try restarting (it happens somethings). 
 If you get UNKNOWN as Laptop type, try restarting (it happens somethings). 
 But if it still happenes that might mean the Drivers Installation failed, Make sure you have the approprite kernel headers to compile the drivers.
 
@@ -118,8 +171,17 @@ Please open a new issue or discussion and include the logs to get support and he
 - [Gemini](https://gemini.google.com/) for the combination of the PredatorSense and NitroSense icon
 
 
+## ❤️ Credit
+
+- The custom drivers for this project [Linuwu Sense](https://github.com/kleqing/Linuwu-Sense) is a forked from [Div-Linuwu Sense](https://github.com/PXDiv/Div-Linuwu-Sense) project which is built entirely on top of the [Linuwu Sense](https://github.com/0x7375646F/Linuwu-Sense) drivers — huge thanks to their developers for enabling hardware-level access on Acer laptops.
+- [Gemini](https://gemini.google.com/) for the combination of the PredatorSense and NitroSense icon
+
+
 ## 🤝 Contributing
 
+- Report bugs or request features via GitHub Issues
+- Submit pull requests to improve code or UI
+- Help test on different Acer laptop models
 - Report bugs or request features via GitHub Issues
 - Submit pull requests to improve code or UI
 - Help test on different Acer laptop models
