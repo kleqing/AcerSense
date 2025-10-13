@@ -7,32 +7,29 @@
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
 
         x:Class="DivAcerManagerMax.MainWindow"
-        Title="DAMX"
-        Icon="iconTransparent.png"
+        Title="AcerSense"
+        Icon="icon.png"
         WindowStartupLocation="CenterScreen"
         SystemDecorations="Full"
         Background="#0e0e11"
 
-        Width="1280" Height="780"
-        MinWidth="1280" MinHeight="520">
-    
+        Width="1280" Height="720"
+        MinWidth="800" MinHeight="600">
+
     <Grid>
 
         <Grid RowDefinitions="Auto,*">
 
             <!-- App Header -->
-            <Image Source="iconHeader.png" Height="50" Margin="0 10 0 11" HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom" />
-            <Border Grid.Row="0" Padding="0 20 0 0" CornerRadius="20">
+            <Border Grid.Row="0" CornerRadius="20">
 
-                <StackPanel HorizontalAlignment="Right" Margin="0" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0" Orientation="Horizontal">
 
-                    <TextBlock Text="" FontSize="26" FontWeight="Bold"
+                    <TextBlock Text="" FontSize="10" FontWeight="Bold"
                                LetterSpacing="4" VerticalAlignment="Bottom"
                                HorizontalAlignment="Right" Margin="0 0 20 0"
                                FontFamily="{StaticResource OxaniumBoldFont}">
                         <TextBlock.Foreground>
-
 
                             <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%, 100%">
                                 <GradientStop Offset="0" Color="#72bff4" />
@@ -43,7 +40,6 @@
 
                 </StackPanel>
             </Border>
-
 
             <!-- Main Content -->
             <TabControl Grid.Row="1" Margin="10,0,10,10" CornerRadius="20" Background="#18181b" BorderBrush="#18181b"
@@ -62,7 +58,7 @@
                         <TextBlock Text="Fans &amp; Performance" VerticalAlignment="Center" FontSize="17"
                                    Padding="0, 0, 0, 4" />
                     </TabItem.Header>
-                    <ScrollViewer>
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
                         <StackPanel Margin="10,0,20,0">
                             <TextBlock Text="Fans &amp; Performance" Classes="SectionHeader" />
 
@@ -222,7 +218,7 @@
                     <TabItem.Header>
                         <TextBlock Text="Power Controls" VerticalAlignment="Center" FontSize="17" Padding="0, 0, 0, 4" />
                     </TabItem.Header>
-                    <ScrollViewer>
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
                         <StackPanel Margin="10,0,20,0">
                             <TextBlock Text="Power Controls" Classes="SectionHeader" />
 
@@ -303,7 +299,7 @@
                         <TextBlock Text="Keyboard Lighting" VerticalAlignment="Center" FontSize="17"
                                    Padding="0, 0, 0, 4" />
                     </TabItem.Header>
-                    <ScrollViewer>
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
                         <StackPanel Margin="10,0,20,0">
                             <TextBlock Text="Keyboard Lighting" Classes="SectionHeader" />
                             <TextBlock Text="This Section Requires Testing." Foreground="#FFA500" Margin="0 0 0 10"
@@ -311,7 +307,7 @@
                                        TextWrapping="Wrap" />
 
                             <!-- Zone Color Control -->
-                            
+
                             <Border Classes="Card" x:Name="ZoneColorControlPanel">
                                 <StackPanel>
                                     <TextBlock Text="Zone Color Control" Classes="SubHeader" />
@@ -328,7 +324,7 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        
+
                                         <!-- Zone 1 -->
                                         <Grid Grid.Column="0" Grid.Row="0" Margin="10,10" VerticalAlignment="Center">
                                             <Grid.ColumnDefinitions>
@@ -350,7 +346,7 @@
                                                              Height="50"
                                                              Width="200" />
                                             </StackPanel>
-                                            
+
                                         </Grid>
 
                                         <!-- Zone 2 -->
@@ -373,7 +369,7 @@
                                                              Height="50"
                                                              Width="200" />
                                             </StackPanel>
-                                            
+
                                         </Grid>
 
                                         <!-- Zone 3 -->
@@ -436,7 +432,7 @@
                                                        Text="{Binding #KeyBrightnessSlider.Value, StringFormat='{}{0:F0}%'}"
                                                        VerticalAlignment="Center" />
                                         </Grid>
-                                        
+
                                     </Grid>
 
                                     <TextBlock
@@ -450,7 +446,7 @@
                                     <Button x:Name="ApplyKeyboardColorsButton" Content="Apply Zone Colors"
                                             Margin="0 15 0 0" />
                                 </StackPanel>
-                                
+
                             </Border>
 
                             <!-- Lighting Effects -->
@@ -530,7 +526,7 @@
                                               Margin="0 10" />
                                 </StackPanel>
                             </Border>
-                            
+
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
@@ -540,7 +536,7 @@
                     <TabItem.Header>
                         <TextBlock Text="System Settings" VerticalAlignment="Center" FontSize="17" Padding="0, 0, 0, 4" />
                     </TabItem.Header>
-                    <ScrollViewer>
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
                         <StackPanel Margin="10,0,20,0">
                             <TextBlock Text="System Settings" Classes="SectionHeader" />
 
@@ -577,43 +573,50 @@
                                 <StackPanel>
                                     <TextBlock Text="System Information" Classes="SubHeader" />
 
-                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                                    <Grid ColumnDefinitions="Auto,*"
+                                          RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto, Auto"
                                           Margin="0 10">
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Model:" FontWeight="SemiBold"
                                                    Width="150" Margin="0 10 0 0" />
-                                        <TextBlock x:Name="ModelNameText" Grid.Row="0" Grid.Column="1" Text="UNKNOWN"
+                                        <TextBlock x:Name="ModelNameText" Grid.Row="0" Grid.Column="1" Text="Unknown"
                                                    Margin="5 10 0 0" />
 
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Laptop Type:"
                                                    FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
-                                        <TextBlock x:Name="LaptopTypeText" Grid.Row="1" Grid.Column="1" Text="UNKNOWN"
+                                        <TextBlock x:Name="LaptopTypeText" Grid.Row="1" Grid.Column="1" Text="Unknown"
                                                    Margin="5 10 0 0" />
 
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Supported Features:" FontWeight="SemiBold"
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Supported Features:"
+                                                   FontWeight="SemiBold"
                                                    Width="150" Margin="0 10 0 0" />
                                         <TextBlock x:Name="SupportedFeaturesTextBlock" Grid.Row="2" Grid.Column="1"
-                                                   Text="UNKNOWN" Margin="5 10 0 0" TextWrapping="Wrap" />
+                                                   Text="Unknown" Margin="5 10 0 0" TextWrapping="Wrap" />
 
-                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Project Version:"
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Kernel Version:"
                                                    FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
-                                        <TextBlock x:Name="ProjectVersionText" Grid.Row="5" Grid.Column="1"
-                                                   Text="UNKNOWN" Margin="5 10 0 0" />
+                                        <TextBlock x:Name="LinuxKernelVersionText" Grid.Row="3" Grid.Column="1"
+                                                   Text="Unknown" Margin="5 10 0 0" />
 
-
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Daemon Version:"
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Daemon Version:"
                                                    FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
-                                        <TextBlock x:Name="DaemonVersionText" Grid.Row="3" Grid.Column="1"
-                                                   Text="UNKNOWN" Margin="5 10 0 0" />
+                                        <TextBlock x:Name="DaemonVersionText" Grid.Row="4" Grid.Column="1"
+                                                   Text="Unknown" Margin="5 10 0 0" />
 
-                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Driver Version:"
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Driver Version:"
                                                    FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
-                                        <TextBlock x:Name="DriverVersionText" Grid.Row="4" Grid.Column="1"
-                                                   Text="UNKNOWN" Margin="5 10 0 0" />
+                                        <TextBlock x:Name="DriverVersionText" Grid.Row="5" Grid.Column="1"
+                                                   Text="Unknown" Margin="5 10 0 0" />
+
+                                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Project Version:"
+                                                   FontWeight="SemiBold" Width="150" Margin="0 10 0 0" />
+                                        <TextBlock x:Name="ProjectVersionText" Grid.Row="6" Grid.Column="1"
+                                                   Text="Unknown" Margin="5 10 0 0" />
+
                                     </Grid>
 
                                     <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Stretch">
-                                        <Button x:Name="UpdatesButton" Content="Check for Updates" Margin="0 15 0 0"
-                                                Click="UpdatesButton_OnClick" />
+                                        <Button x:Name="UpdateButton" Content="Check for Update" Margin="0 15 0 0"
+                                                Click="UpdateButton_OnClick" />
                                         <Button x:Name="DeveloperModeButton" Content="Developer Mode" Margin="0 15 0 0"
                                                 IsVisible="False"
                                                 Click="DeveloperMode_OnClick" />
