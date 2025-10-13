@@ -1,41 +1,41 @@
 # ❓ Frequently Asked Questions (FAQ)
 
-### 🔧 Driver Installation Fails
+### 🔧 Driver installation fails
 
 There are several common reasons for driver installation issues:
 
-1. **Incompatible Kernel Version**
-   Linuwu Sense drivers require **Linux kernel 6.13 or later**. If you're running an older kernel, the installation will fail. Please update your kernel before proceeding.
+1. **Incompatible kernel version**
+   - Linuwu Sense drivers require **Linux kernel 6.13 or later**. If you're running an older kernel, the installation will fail. Please update your kernel before proceeding.
 
-2. **Secure Boot is Enabled**
-   Secure Boot prevents unsigned kernel modules from loading. This can cause errors like:
+2. **Secure Boot is enabled**
+   - Secure Boot prevents unsigned kernel modules from loading. This can cause errors like:
 
-   ```
-   modprobe: ERROR: could not insert 'linuwu_sense': Key was rejected by service
-   make: Error 1
-   ```
+      ```
+      modprobe: ERROR: could not insert 'linuwu_sense': Key was rejected by service
+      make: Error 1
+      ```
 
-   **Solution**: Disable Secure Boot in your BIOS/UEFI settings and try installing again.
+   - **Temporary Solution**: Disable Secure Boot in your BIOS/UEFI settings and try installing again.
 
-3. **Installation Path Contains Spaces**
-   If the installation directory contains spaces (e.g., `DAMX-0.8.8 (1)/setup.sh`), the install script may fail.
+3. **Installation path contains spaces**
+   - If the installation directory contains spaces (e.g., `Acer Sense/setup.sh`), the install script may fail.
    **Solution**: Move or rename the directory so it has **no spaces in the path**.
 
 ---
 
-### 🧩 GUI is Empty or Showing "Unknown Model" (Even Though Your Model Is Supported)
+### 🧩 GUI is empty or showing "Unknown Model" (Even though your model is supported)
 
 This is usually caused by model detection issues:
 
-* **Acer Firmware Quirks**: Some Acer devices behave inconsistently during hardware detection.
+* **Acer firmware quirks**: Some Acer devices behave inconsistently during hardware detection.
   **Try restarting your laptop** or **reinstalling the drivers**.
 
-* **Distro Compatibility Issues**:
-  The DAMX project is officially tested and supported on **Ubuntu only**. Other Linux distributions might introduce kernel or library incompatibilities, leading to missing features in the GUI.
+* ~~**Distro Compatibility Issues**:
+  The DAMX project is officially tested and supported on **Ubuntu only**. Other Linux distributions might introduce kernel or library incompatibilities, leading to missing features in the GUI.~~
 
 ---
 
-### 🛑 It Shows "Unknown Model" and My Model Isn’t in the Compatibility List
+### 🛑 It shows "Unknown Model" and my model isn’t in the Compatibility List
 
 No worries! Your device might still be supported unofficially.
 
@@ -50,63 +50,62 @@ No worries! Your device might still be supported unofficially.
 
 Want native support?
 
-* Head over to the Div-Linuwu Sense project and **submit your device’s quirk configuration in the driver itself** to help others in the community.
+* Head over to my [Linuwu Sense](https://github.com/kleqing/Linuwu-Sense) project and **submit your device’s quirk configuration in the driver itself** to help others in the community.
 
 ---
 
-### 🛠️ I Want to Add Support for My Own Model – How?
+### 🛠️ I want to add support for my own model – How?
 
-You have two options:
+- **Fork and modify the Linuwu Sense**
 
-1. **Fork and Modify the Original Project**
-
-   * Clone the original [linuwu-sense](#) repository
-   * Add your model-specific quirks/configuration
-   * Build and test
-
-1. **Use the Div-Linuwu Sense Fork (Recommended)**
-
-   * This is a more stable, community-friendly fork tailored for **DAMX project integration**
+   * This driver is a forked version from [PXDiv](https://github.com/PXDiv/Div-Linuwu-Sense) but I added more supported for most model (from PRs)
    * Submit your config via a pull request
    * Active and regularly updated, unlike the upstream project
   
-- The original developer seems to be busy and has very less time to review or update the code let alone take pull requests. thats why i've forked the project to make sure updates and pull requests get pushed fast.
+- The original developer of `linuwu-sense` seems to be busy and has very less time. Even the author of `DAMX` was on that situation too. So that I forked their project and added more quirk to support more device. Note that all of the quirk I added has been comfirmed to work by the community.
 
 ---
 
-### 🛠️ How do I write the quirk configuration in the driver itself to get native support?
+### 🤔 How do I write the quirk configuration in the driver itself to get native support?
+
 Here's a user-friendly process to add support for a new Acer laptop model to the `linuwu_sense.c` driver:
 
 ### Step-by-Step Guide to Add a New Model Quirk
 
-1. **Identify Your Laptop Model**
+1. **Identify your laptop model**
    - Run `sudo dmidecode -s system-product-name` in terminal to get your exact model name
    - Note down any special features your model has (RGB keyboard, special cooling system, etc.)
 
-2. **Check Existing Quirks**
+2. **Open the driver config in a text editor**
+   - Open the `linuwu_sense.c` located in the AcerSense directory where you run the `setup.sh` (Default directory is `/AcerSense/Linuwu-Sense/src/linuwu_sense.c`)
+   - If you think the driver is out of date, you can clone the project at [here](https://github.com/kleqing/Linuwu-Sense). Make sure that you have to extract and replace the `Linuwu-Sense` folder in the AcerSense directory.
+
+3. **Check existing quirks**
    - Look through the existing quirk entries in the file (search for `quirk_acer_` to find them)
    - Find one that matches your laptop's capabilities as closely as possible
 
-3. **Create Your Quirk Entry**
+4. **Create your quirk entry**
    - Add a new entry in the quirks section following this format:
+
      ```c
      static struct quirk_entry quirk_acer_YOUR_MODEL = {
-        .predator_v4 = 1,             // If uses Predator Sense v4
-        .nitro_v4 = 1,                // If uses Nitro Sense v4
-        .nitro_sense = 1,             // If it does'nt support LCD Override and Boot Animation Sound use nitro_sense
-        .four_zone_kb = 1             // If has 4-zone RGB keyboard
-     
-        //special quirks (only add these if you know what you are doing and your hardware supports it)
-        .wireless = 1,                // If has special wireless handling
-        .brightness = -1,              // If has brightness control
-        .turbo = 1,                   // If has turbo mode (turbo mode is detected by driver itself, you don't explicitly need to enable it, is only needed in specific scenarios and models)
-        .cpu_fans = 1,                // Number of CPU fans
-        .gpu_fans = 1,                // Number of GPU fans
+         .predator_v4 = 1,             // If uses Predator Sense v4
+         .nitro_v4 = 1,                // If uses Nitro Sense v4
+         .nitro_sense = 1,             // If it does not support LCD Override and Boot Animation Sound, use nitro_sense
+         .four_zone_kb = 1             // If has 4-zone RGB keyboard
+      
+         //special quirks (only add these if you know what you are doing and your hardware supports it)
+         .wireless = 1,                // If has special wireless handling
+         .brightness = -1,              // If has brightness control
+         .turbo = 1,                   // If has turbo mode (turbo mode is detected by driver itself, you don't explicitly need to enable it, is only needed in specific scenarios and models)
+         .cpu_fans = 1,                // Number of CPU fans
+         .gpu_fans = 1,                // Number of GPU fans
      };
      ```
 
-4. **Add DMI Match Entry**
+5. **Add DMI to match entry**
    - Add your model to the `acer_quirks` array:
+
      ```c
      {
          .callback = dmi_matched,
@@ -119,40 +118,44 @@ Here's a user-friendly process to add support for a new Acer laptop model to the
      },
      ```
 
-5. **Test Your Changes**
-   - Save the driver and its changes in the DAMX's Linuwu Sense Directory
+6. **Test your changes**
 
-   - Reinstall DAMX(will automatically reinstall the driver):
+   - Save the files and its changes in the DAMX's Linuwu Sense Directory
+
+   - Reinstall AcerSense (run `./setup.sh` and choose option 4, it will automatically reinstall the driver):
 
    - Check dmesg for errors:
      ```bash
      dmesg
      ```
-   - Check DAMX for all the features you wanted:
+   - Check AcerSense for all the features you wanted:
      
 
-6. **Submit Your Changes**
-   - Fork the GitHub repository
+7. **Submit your changes**
+
+   - Fork [this](https://github.com/kleqing/Linuwu-Sense/fork) GitHub repository
    - Create a branch for your changes
    - Commit your changes with a descriptive message
    - Create a pull request to the original repository
 
-### Example for a New Model 
+### Example for a new model 
 
 *If your model does not require much config and does not have special features like Four zone RGB kayboard you can just add:*
-```c
-/* Add to acer_quirks array (Starting around line 570): */
 
-   {
-         .callback = dmi_matched,
-         .ident = "Acer Nitro ANV15-51",
-         .matches = {
-             DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
-             DMI_MATCH(DMI_PRODUCT_NAME, "Nitro ANV15-51"),
-         },
-            .driver_data = &quirk_acer_nitro, //This line here tells which quirk list (struct) to use, since we want the default nitro_sense quirk, it'll initialize with just the default config 
-     },
+```c
+/* Add to acer_quirks array (Starting around line 680, if you don't see, just scroll down a bit): */
+
+{
+   .callback = dmi_matched,
+   .ident = "Acer Nitro ANV15-51",
+   .matches = {
+         DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
+         DMI_MATCH(DMI_PRODUCT_NAME, "Nitro ANV15-51"),
+   },
+      .driver_data = &quirk_acer_nitro, //This line here tells which quirk list (struct) to use, since we want the default nitro_sense quirk, it'll initialize with just the default config 
+},
 ```
+
 This will just enable the base quirk with defaults of nitro_sense
 
 Here are the default structs:
@@ -161,24 +164,24 @@ Here are the default structs:
 - For nitro_sense use `.driver_data = &quirk_acer_nitro` //Used in nitro models without special features like lcd override and boot sound (like ANV15-51). <br>
 
 
-*For an "Acer Predator AN515-58" with all features:*
+*For an "Acer Nitro 5 AN515-45" with all features:*
 
 ```c
- static struct quirk_entry quirk_acer_nitro_an515_58 = {
-    .nitro_v4 = 1,
-    .four_zone_kb = 1,
- };
+static struct quirk_entry quirk_acer_nitro_an515_45 = {
+   .nitro_v4 = 1,
+   .four_zone_kb = 1,
+};
 
 /* Then add to acer_quirks array: */
-   {
-        .callback = dmi_matched,
-        .ident = "Acer Nitro AN515-58",
-        .matches = {
-            DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
-            DMI_MATCH(DMI_PRODUCT_NAME, "Nitro AN515-58"),
-        },
-        .driver_data = &quirk_acer_nitro_an515_58,
-    },
+{
+   .callback = dmi_matched,
+   .ident = "Acer Nitro AN515-45",
+   .matches = {
+      DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
+      DMI_MATCH(DMI_PRODUCT_NAME, "Nitro AN515-45"),
+   },
+   .driver_data = &quirk_acer_nitro_an515_45,
+},
 ```
 
 *For an "Acer Predator PHN16-73" with all special features:*
@@ -194,13 +197,13 @@ static struct quirk_entry quirk_acer_predator_phn16_73 = {
 
 /* Then add to acer_quirks array: */
 {
-    .callback = dmi_matched,
-    .ident = "Acer Predator PHN16-73",
-    .matches = {
-        DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
-        DMI_MATCH(DMI_PRODUCT_NAME, "Predator PHN16-73"),
-    },
-    .driver_data = &quirk_acer_predator_phn16_73,
+   .callback = dmi_matched,
+   .ident = "Acer Predator PHN16-73",
+   .matches = {
+      DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
+      DMI_MATCH(DMI_PRODUCT_NAME, "Predator PHN16-73"),
+   },
+   .driver_data = &quirk_acer_predator_phn16_73,
 },
 ```
 
@@ -223,4 +226,8 @@ Remember to always keep a backup of your working kernel/driver before making cha
 ---
 
 Have more questions or need help?
-👉 Feel free to [open an issue](#issues) or join the discussions.
+- 👉 Feel free to [open an issue](#issues) or join the discussions.
+
+## ❤️ Credit
+
+- All the original credit of this FAQ page is belongs to [PXDiv](https://github.com/PXDiv)
