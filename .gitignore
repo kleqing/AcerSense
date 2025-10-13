@@ -48,3 +48,6 @@ artifacts/
 # Daemon
 DAMM-Daemon/build/
 DAMM-Daemon/dist/
+
+# Release
+[Bb]in/[Rr]elease
