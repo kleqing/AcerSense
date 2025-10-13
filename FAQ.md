@@ -226,7 +226,7 @@ Remember to always keep a backup of your working kernel/driver before making cha
 ---
 
 Have more questions or need help?
-- 👉 Feel free to [open an issue](#issues) or join the discussions.
+- 👉 Feel free to [open an issue](https://github.com/kleqing/Linuwu-Sense/issues) or join the discussions.
 
 ## ❤️ Credit
 
