@@ -60,7 +60,7 @@ Want native support?
 
    * This driver is a forked version from [PXDiv](https://github.com/PXDiv/Div-Linuwu-Sense) but I added more supported for most model (from PRs)
    * Submit your config via a pull request
-   * Active and regularly updated, unlike the upstream project
+   * I will accept every PRs that verify as working properly but I also review the code to make sure there is no trojan or spyware inside the code.
   
 - The original developer of `linuwu-sense` seems to be busy and has very less time. Even the author of `DAMX` was on that situation too. So that I forked their project and added more quirk to support more device. Note that all of the quirk I added has been comfirmed to work by the community.
 
