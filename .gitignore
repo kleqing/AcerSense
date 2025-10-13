@@ -1,19 +1,50 @@
+# From .NET Core 3.0 you can use the command: `dotnet new gitignore` to generate a customizable .gitignore file
 
-DivAcerManagerMax/obj/
+*.swp
+*.*~
+project.lock.json
+.DS_Store
+*.pyc
 
-DivAcerManagerMax/bin/Release/net9.0/linux-x64/
+# Visual Studio Code
+.vscode
 
-DivAcerManagerMax/bin/Debug/net9.0/
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
-Publish/
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[Pp]ublish/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+msbuild.log
+msbuild.err
+msbuild.wrn
 
-publish/
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
 
-buildPublish/
+# NuGet Packages
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
 
-DAMM-Daemon/build/
-
-DAMM-Daemon/dist/
-
+# IDE
 .idea/
 .vs/
+
+# Daemon
+DAMM-Daemon/build/
+DAMM-Daemon/dist/
