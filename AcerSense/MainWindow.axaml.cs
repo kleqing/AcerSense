@@ -25,7 +25,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     };
 
     private readonly string _effectColor = "#0078D7";
-    private readonly string ProjectVersion = "0.0.1-rc";
+    private readonly string ProjectVersion = "1.0.0";
 
     // UI Controls (will be bound via NameScope)
     private Button _applyKeyboardColorsButton;
@@ -35,7 +35,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private CheckBox _batteryLimitCheckBox;
     private CheckBox _bootAnimAndSoundCheckBox;
     private TextBlock _calibrationStatusTextBlock;
-    public DAMXClient _client;
+    public AcerSense _client;
     private Slider _cpuFanSlider;
     private int _cpuFanSpeed = 50;
     private TextBlock _cpuFanTextBlock;
@@ -61,6 +61,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private int _lightingSpeed = 5;
     private Slider _lightingSpeedSlider;
     private TextBlock _lightSpeedTextBlock;
+    private TextBlock _linuxKernelVersionText;
     private RadioButton _lowPowerProfileButton;
     private RadioButton _manualFanSpeedRadioButton;
     private RadioButton _maxFanSpeedRadioButton;
@@ -70,7 +71,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private ToggleSwitch _powerToggleSwitch;
     private RadioButton _quietProfileButton;
     private Button _setManualSpeedButton;
-    public DAMXSettings _settings;
+    public AcerSenseSettings _settings;
     private Button _startCalibrationButton;
     private Button _stopCalibrationButton;
     private TextBlock _supportedFeaturesTextBlock;
@@ -86,7 +87,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         InitializeComponent();
         DataContext = this;
-        _client = new DAMXClient();
+        _client = new AcerSense();
         Loaded += MainWindow_Loaded;
     }
 
@@ -171,10 +172,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _driverVersionText = nameScope.Find<TextBlock>("DriverVersionText");
         _guiVersionTextBlock = nameScope.Find<TextBlock>("ProjectVersionText");
         _daemonErrorGrid = nameScope.Find<Grid>("DaemonErrorGrid");
+        _linuxKernelVersionText = nameScope.Find<TextBlock>("LinuxKernelVersionText");
 
         // Set initial GUI version
         if (_guiVersionTextBlock != null)
-            _guiVersionTextBlock.Text = $"v{ProjectVersion}";
+            _guiVersionTextBlock.Text = $"{ProjectVersion}";
     }
 
     private void AttachEventHandlers()
@@ -337,7 +339,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 await ShowMessageBox(
                     "Error Connecting to Daemon",
-                    "Failed to connect to DAMX daemon. The Daemon may be initializing please wait.");
+                    "Failed to connect to daemon. The Daemon may be initializing please wait.");
                 _daemonErrorGrid.IsVisible = true;
             }
         }
@@ -352,13 +354,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         try
         {
-            _settings = await _client.GetAllSettingsAsync() ?? new DAMXSettings();
+            _settings = await _client.GetAllSettingsAsync() ?? new AcerSenseSettings();
             ApplySettingsToUI();
         }
         catch (Exception ex)
         {
             await ShowMessageBox("Error while loading settings", $"Error loading settings: {ex.Message}");
-            _settings = new DAMXSettings();
+            _settings = new AcerSenseSettings();
             ApplySettingsToUI();
         }
     }
@@ -500,19 +502,28 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             _lightSpeedTextBlock.Text = _lightingSpeed.ToString();
 
         if (_daemonVersionText != null)
-            _daemonVersionText.Text = $"v{_settings.Version}";
+            _daemonVersionText.Text = $"{_settings.Version}";
 
         if (_driverVersionText != null)
-            _driverVersionText.Text = $"v{_settings.DriverVersion}";
+            _driverVersionText.Text = $"{_settings.DriverVersion}";
 
         if (_laptopTypeText != null)
-            _laptopTypeText.Text = _settings.LaptopType;
+        {
+            var type = _settings.LaptopType;
+            if (!string.IsNullOrEmpty(type)) type = char.ToUpper(type[0]) + type.Substring(1).ToLower();
+
+            _laptopTypeText.Text = type;
+        }
+
 
         if (_supportedFeaturesTextBlock != null)
             _supportedFeaturesTextBlock.Text = string.Join(", ", _settings.AvailableFeatures.Select(FormatFeatureName));
 
         if (_modelNameText != null)
-            _modelNameText.Text = GetLinuxLaptopModel();
+            _modelNameText.Text = $"Acer {GetLinuxLaptopModel()}";
+
+        if (_linuxKernelVersionText != null)
+            _linuxKernelVersionText.Text = $"Linux {GetLinuxKernelVersion()}";
 
         UpdateUIElementVisibility();
     }
@@ -542,6 +553,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Console.WriteLine($"Error getting laptop model: {ex.Message}");
             return "Unknown";
         }
+    }
+
+    private string GetLinuxKernelVersion()
+    {
+        var getKernel = new ProcessStartInfo
+        {
+            FileName = "/bin/bash",
+            Arguments = "-c \" uname -r\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        using var process = Process.Start(getKernel);
+        process?.WaitForExit();
+        return process?.StandardOutput.ReadToEnd().Trim() ?? "Unknown";
     }
 
     private void ApplyKeyboardSettings()
@@ -577,21 +603,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitializeAsync();
     }
 
-    private void UpdatesButton_OnClick(object? sender, RoutedEventArgs e)
+    private void UpdateButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/releases")
+        Process.Start(new ProcessStartInfo("xdg-open", "https://github.com/kleqing/AcerSense/releases")
             { UseShellExecute = true });
     }
 
     private void StarProject_OnClick(object? sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/")
+        Process.Start(new ProcessStartInfo("xdg-open", "https://github.com/kleqing/AcerSense/")
             { UseShellExecute = true });
     }
 
     private void IssuePageButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo("xdg-open", "https://github.com/PXDiv/Div-Acer-Manager-Max/issues")
+        Process.Start(new ProcessStartInfo("xdg-open", "https://github.com/kleqing/AcerSense/issues")
             { UseShellExecute = true });
     }
 
