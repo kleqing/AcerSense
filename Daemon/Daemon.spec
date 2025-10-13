@@ -1,8 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 a = Analysis(
-    ['DAMX-Daemon.py'],
+    ['Daemon.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -22,7 +21,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='DAMX-Daemon',
+    name='AcerSense-Daemon',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

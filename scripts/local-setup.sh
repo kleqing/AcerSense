@@ -1,21 +1,21 @@
 #!/bin/bash
 
-# DAMX Installer Script
-# This script installs, uninstalls, or updates the DAMX Suite for Acer laptops on Linux
-# Components: Linuwu-Sense (drivers), DAMX-Daemon, and DAMX-GUI
+# Acer Sense Installer Script
+# This script installs, uninstalls, or updates the Acer Sense
+# Components: Linuwu-Sense (drivers), Daemon, and AcerSense GUI
 
 # Constants
-SCRIPT_VERSION="0.8.8"
-INSTALL_DIR="/opt/damx"
+SCRIPT_VERSION="1.0.0"
+INSTALL_DIR="/opt/acersense"
 BIN_DIR="/usr/local/bin"
 SYSTEMD_DIR="/etc/systemd/system"
-DAEMON_SERVICE_NAME="damx-daemon.service"
+DAEMON_SERVICE_NAME="acersense-daemon.service"
 DESKTOP_FILE_DIR="/usr/share/applications"
 ICON_DIR="/usr/share/icons/hicolor/256x256/apps"
 
 # Legacy paths for cleanup (uppercase naming convention)
-LEGACY_INSTALL_DIR="/opt/DAMX"
-LEGACY_DAEMON_SERVICE_NAME="DAMX-Daemon.service"
+LEGACY_INSTALL_DIR="/opt/ACERSENSE"
+LEGACY_DAEMON_SERVICE_NAME="ACERSENSE-Daemon.service"
 
 # Colors for terminal output
 RED='\033[0;31m'
@@ -51,7 +51,7 @@ check_root() {
 print_banner() {
   clear
   echo -e "${BLUE}==========================================${NC}"
-  echo -e "${BLUE}       DAMX Suite Installer v${SCRIPT_VERSION}        ${NC}"
+  echo -e "${BLUE}       AcerSense Installer v${SCRIPT_VERSION}        ${NC}"
   echo -e "${BLUE}    Acer Laptop WMI Controls for Linux  ${NC}"
   echo -e "${BLUE}==========================================${NC}"
   echo ""
@@ -94,9 +94,9 @@ cleanup_legacy_installation() {
 
   # Check for other potential legacy artifacts
   local legacy_artifacts=(
-    "/usr/local/bin/DAMX-Daemon"
-    "/usr/share/applications/DAMX.desktop"
-    "/usr/share/icons/hicolor/256x256/apps/DAMX.png"
+    "/usr/local/bin/AcerSense-Daemon"
+    "/usr/share/applications/AcerSense.desktop"
+    "/usr/share/icons/hicolor/256x256/apps/AcerSense.png"
   )
 
   for artifact in "${legacy_artifacts[@]}"; do
@@ -125,12 +125,12 @@ comprehensive_cleanup() {
 
   # Stop and disable current daemon service
   if systemctl is-active --quiet ${DAEMON_SERVICE_NAME} 2>/dev/null; then
-    echo "Stopping current DAMX-Daemon service..."
+    echo "Stopping current Daemon service..."
     systemctl stop ${DAEMON_SERVICE_NAME}
   fi
 
   if systemctl is-enabled --quiet ${DAEMON_SERVICE_NAME} 2>/dev/null; then
-    echo "Disabling current DAMX-Daemon service..."
+    echo "Disabling current Daemon service..."
     systemctl disable ${DAEMON_SERVICE_NAME}
   fi
 
@@ -146,9 +146,9 @@ comprehensive_cleanup() {
   # Remove current installed files
   echo "Removing current installation files..."
   rm -rf ${INSTALL_DIR}
-  rm -f ${BIN_DIR}/DAMX
-  rm -f ${DESKTOP_FILE_DIR}/damx.desktop
-  rm -f ${ICON_DIR}/damx.png
+  rm -f ${BIN_DIR}/AcerSense
+  rm -f ${DESKTOP_FILE_DIR}/acersense.desktop
+  rm -f ${ICON_DIR}/acersense.png
 
   # Uninstall drivers if Linuwu-Sense folder exists
   if [ -d "Linuwu-Sense" ]; then
@@ -156,6 +156,7 @@ comprehensive_cleanup() {
     cd Linuwu-Sense
     if [ -f "Makefile" ]; then
       make uninstall 2>/dev/null || true
+      make clean 2>/dev/null || true
     fi
     cd ..
   fi
@@ -203,11 +204,11 @@ install_drivers() {
 }
 
 install_daemon() {
-  echo -e "${YELLOW}Installing DAMX-Daemon...${NC}"
+  echo -e "${YELLOW}Installing Daemon...${NC}"
 
-  if [ ! -d "DAMX-Daemon" ]; then
-    echo -e "${RED}Error: DAMX-Daemon directory not found!${NC}"
-    echo "Please make sure the script is run from the same directory containing DAMX-Daemon folder."
+  if [ ! -d "Daemon" ]; then
+    echo -e "${RED}Error: Daemon directory not found!${NC}"
+    echo "Please make sure the script is run from the same directory containing Daemon folder."
     pause
     return 1
   fi
@@ -216,18 +217,18 @@ install_daemon() {
   mkdir -p ${INSTALL_DIR}/daemon
 
   # Copy daemon binary
-  cp -f DAMX-Daemon/DAMX-Daemon ${INSTALL_DIR}/daemon/
-  chmod +x ${INSTALL_DIR}/daemon/DAMX-Daemon
+  cp -f Daemon/AcerSense-Daemon ${INSTALL_DIR}/daemon/
+  chmod +x ${INSTALL_DIR}/daemon/AcerSense-Daemon
 
   # Create systemd service file with improved configuration
   cat > ${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME} << EOL
 [Unit]
-Description=DAMX Daemon for Acer laptops
+Description=Daemon for Acer laptops
 After=network.target
 
 [Service]
 Type=simple
-ExecStart=${INSTALL_DIR}/daemon/DAMX-Daemon
+ExecStart=${INSTALL_DIR}/daemon/AcerSense-Daemon
 Restart=on-failure
 RestartSec=5
 User=root
@@ -245,20 +246,20 @@ EOL
 
   # Verify service is running
   if systemctl is-active --quiet ${DAEMON_SERVICE_NAME}; then
-    echo -e "${GREEN}DAMX-Daemon installed and service started successfully!${NC}"
+    echo -e "${GREEN}Daemon installed and service started successfully!${NC}"
     return 0
   else
-    echo -e "${RED}Warning: DAMX-Daemon service may not have started correctly. Check with 'systemctl status ${DAEMON_SERVICE_NAME}'${NC}"
+    echo -e "${RED}Warning: Daemon service may not have started correctly. Check with 'systemctl status ${DAEMON_SERVICE_NAME}'${NC}"
     return 1
   fi
 }
 
 install_gui() {
-  echo -e "${YELLOW}Installing DAMX-GUI...${NC}"
+  echo -e "${YELLOW}Installing AcerSense...${NC}"
 
-  if [ ! -d "DAMX-GUI" ]; then
-    echo -e "${RED}Error: DAMX-GUI directory not found!${NC}"
-    echo "Please make sure the script is run from the same directory containing DAMX-GUI folder."
+  if [ ! -d "AcerSense" ]; then
+    echo -e "${RED}Error: AcerSense directory not found!${NC}"
+    echo "Please make sure the script is run from the same directory containing AcerSense folder."
     pause
     return 1
   fi
@@ -267,22 +268,22 @@ install_gui() {
   mkdir -p ${INSTALL_DIR}/gui
 
   # Copy GUI files
-  cp -rf DAMX-GUI/* ${INSTALL_DIR}/gui/
-  chmod +x ${INSTALL_DIR}/gui/DivAcerManagerMax
+  cp -rf AcerSense/* ${INSTALL_DIR}/gui/
+  chmod +x ${INSTALL_DIR}/gui/AcerSense
 
   # Create icon directory if it doesn't exist
   mkdir -p ${ICON_DIR}
 
   # Copy icon
-  cp -f DAMX-GUI/icon.png ${ICON_DIR}/damx.png
+  cp -f AcerSense/icon.png ${ICON_DIR}/acersense.png
 
   # Create desktop entry
-  cat > ${DESKTOP_FILE_DIR}/damx.desktop << EOL
+  cat > ${DESKTOP_FILE_DIR}/acersense.desktop << EOL
 [Desktop Entry]
-Name=DAMX
-Comment=Div Acer Manager Max
-Exec=${INSTALL_DIR}/gui/DivAcerManagerMax
-Icon=damx
+Name=AcerSense
+Comment=Acer Laptop Control Center. An alternative to PredatorSense/NitroSense for Acer laptops on Linux.
+Exec=${INSTALL_DIR}/gui/AcerSense
+Icon=acersense
 Terminal=false
 Type=Application
 Categories=Utility;System;
@@ -290,13 +291,13 @@ Keywords=acer;laptop;system;
 EOL
 
   # Create command shortcut
-  cat > ${BIN_DIR}/DAMX << EOL
+  cat > ${BIN_DIR}/ACERSENSE << EOL
 #!/bin/bash
-${INSTALL_DIR}/gui/DivAcerManagerMax "\$@"
+${INSTALL_DIR}/gui/AcerSense "\$@"
 EOL
-  chmod +x ${BIN_DIR}/DAMX
+  chmod +x ${BIN_DIR}/AcerSense
 
-  echo -e "${GREEN}DAMX-GUI installed successfully!${NC}"
+  echo -e "${GREEN}AcerSense installed successfully!${NC}"
   return 0
 }
 
@@ -335,8 +336,8 @@ perform_install() {
 
   # Check if all installations were successful
   if [ $DRIVER_RESULT -eq 0 ] && [ $DAEMON_RESULT -eq 0 ] && [ $GUI_RESULT -eq 0 ]; then
-    echo -e "${GREEN}DAMX Suite installation completed successfully!${NC}"
-    echo -e "You can now run the GUI using the ${BLUE}DAMX${NC} command or from your application launcher."
+    echo -e "${GREEN}AcerSense installation completed successfully!${NC}"
+    echo -e "${YELLOW}Please reboot your system to ensure all components are properly initialized.${NC}"
 
     # Show service status
     echo ""
@@ -352,9 +353,9 @@ perform_install() {
 }
 
 uninstall() {
-  echo -e "${YELLOW}Uninstalling DAMX Suite...${NC}"
+  echo -e "${YELLOW}Uninstalling AcerSense...${NC}"
   comprehensive_cleanup
-  echo -e "${GREEN}DAMX Suite uninstalled successfully!${NC}"
+  echo -e "${GREEN}AcerSense uninstalled successfully!${NC}"
   pause
   return 0
 }
@@ -391,10 +392,10 @@ main_menu() {
     print_banner
 
     echo -e "Please select an option:"
-    echo -e "  ${GREEN}1${NC}) Install DAMX Suite (complete)"
-    echo -e "  ${GREEN}2${NC}) Install DAMX Suite (without drivers)"
-    echo -e "  ${GREEN}3${NC}) Uninstall DAMX Suite"
-    echo -e "  ${GREEN}4${NC}) Reinstall/Update DAMX Suite (recommended for upgrades)"
+    echo -e "  ${GREEN}1${NC}) Install AcerSense"
+    echo -e "  ${GREEN}2${NC}) Install AcerSense (without drivers)"
+    echo -e "  ${GREEN}3${NC}) Uninstall AcerSense"
+    echo -e "  ${GREEN}4${NC}) Reinstall/Update AcerSense"
     echo -e "  ${GREEN}5${NC}) Check service status"
     echo -e "  ${GREEN}q${NC}) Quit"
     echo ""
@@ -425,12 +426,12 @@ main_menu() {
         ;;
       5)
         print_banner
-        echo -e "${BLUE}Checking DAMX service status...${NC}"
+        echo -e "${BLUE}Checking service status...${NC}"
         echo ""
         if systemctl list-unit-files | grep -q ${DAEMON_SERVICE_NAME}; then
           systemctl status ${DAEMON_SERVICE_NAME} --no-pager -l
         else
-          echo -e "${YELLOW}DAMX service not found. The suite may not be installed.${NC}"
+          echo -e "${YELLOW}AcerSense service not found. The suite may not be installed.${NC}"
         fi
         echo ""
         pause

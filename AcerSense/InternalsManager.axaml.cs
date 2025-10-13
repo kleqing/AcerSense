@@ -9,7 +9,7 @@ namespace DivAcerManagerMax;
 
 public partial class InternalsManager : Window
 {
-    private const string logPath = "/var/log/DAMX_Daemon_Log.log";
+    private const string logPath = "/var/log/AcerSenseDaemon.log";
     private readonly MainWindow _mainWindow;
 
     public InternalsManager(MainWindow mainWindow)

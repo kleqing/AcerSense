@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 namespace DivAcerManagerMax;
 
 /// <summary>
-///     Client for communicating with the Daemon over Unix socket
+///     Client for communicating with the AcerSense daemon over Unix socket
 /// </summary>
 public class AcerSense : IDisposable
 {
-    private const string SocketPath = "/var/run/DAMX.sock";
+    private const string SocketPath = "/var/run/AcerSense.sock";
 
     /// <summary>
-    ///     Send a command to the Daemon and receive response
+    ///     Send a command to the AcerSense daemon and receive response
     /// </summary>
     /// <param name="command">Command name</param>
     /// <param name="parameters">Optional parameters</param>
@@ -52,7 +52,7 @@ public class AcerSense : IDisposable
     }
 
     /// <summary>
-    ///     Connect to the DAMX-Daemon Unix socket
+    ///     Connect to the AcerSense daemon Unix socket
     /// </summary>
     /// <returns>True if connection successful, false otherwise</returns>
     private async Task<bool> ValidateConnection()
@@ -131,7 +131,7 @@ public class AcerSense : IDisposable
     }
 
     /// <summary>
-    ///     Disconnect from the DAMX-Daemon Unix socket
+    ///     Disconnect from the AcerSense daemon Unix socket
     /// </summary>
     public void Disconnect()
     {
@@ -209,7 +209,7 @@ public class AcerSense : IDisposable
     }
 
     /// <summary>
-    ///     Get all settings from the DAMX-Daemon
+    ///     Get all settings from the AcerSense daemon
     /// </summary>
     /// <returns>All settings as a JsonDocument</returns>
     public async Task<AcerSenseSettings> GetAllSettingsAsync()

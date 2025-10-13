@@ -1,0 +1,1 @@
+pyinstaller --onefile --distpath /home/div/Projects/AcerSense-Daemon/Publish/DaemonPublish/ --clean Daemon.py

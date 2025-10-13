@@ -19,14 +19,13 @@ from pathlib import Path
 from enum import Enum
 from PowerSourceDetection import PowerSourceDetector 
 from typing import Dict, List, Tuple, Set
-# from KeyboardMonitor import KeyboardMonitor
 
 # Constants
-VERSION = "0.4.6"
-SOCKET_PATH = "/var/run/DAMX.sock"
-LOG_PATH = "/var/log/DAMX_Daemon_Log.log"
-CONFIG_PATH = "/etc/DAMX_Daemon/config.ini"
-PID_FILE = "/var/run/DAMX-Daemon.pid"
+VERSION = "1.0"
+SOCKET_PATH = "/var/run/AcerSense.sock"
+LOG_PATH = "/var/log/AcerSenseDaemon.log"
+CONFIG_PATH = "/etc/AcerSenseDaemon/config.ini"
+PID_FILE = "/var/run/AcerSense-Daemon.pid"
 MODPROBE_CONFIG_PATH = "/etc/modprobe.d/linuwu-sense.conf"
 
 # Check if running as root
@@ -35,7 +34,7 @@ if os.geteuid() != 0:
     sys.exit(1)
 
 # Configure logging
-log = logging.getLogger("DAMXDaemon")
+log = logging.getLogger("AcerSenseDaemon")
 log.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -55,15 +54,15 @@ class LaptopType(Enum):
     PREDATOR = 1
     NITRO = 2
 
-class DAMXManager:
-    """Manages all the DAMX-Daemon features"""
+class AcerSenseDaemon:
+    """Manages all the daemon features"""
 
     MAX_RESTART_ATTEMPTS = 20
-    RESTART_COUNTER_FILE = "/tmp/damx_restart_attempts"
+    RESTART_COUNTER_FILE = "/tmp/acersense_daemon_restart_attempts"
 
     def __init__(self):
         '''The initial init (i know very nice description)'''
-        log.info(f"** Starting DAMX-Daemon v{VERSION} **")
+        log.info(f"** Starting AcerSense daemon v{VERSION} **")
 
         # Check if linuwu_sense is installed
         if not os.path.exists("/sys/module/linuwu_sense"):
@@ -72,7 +71,6 @@ class DAMXManager:
             log.info("linuwu_sense module found. Proceeding with initialization.")
         
         self.laptop_type = self._detect_laptop_type()
-        # self.keyboard_monitor = None
 
         #added a delay so that driver sets up properly first
         time.sleep(0.2)
@@ -146,8 +144,8 @@ class DAMXManager:
             log.error(f"Failed to reset restart counter: {e}")
 
     def _force_model_nitro(self):
-        """Restart linuwu-sense driver and DAMX daemon service with nitro_v4 parameter"""
-        log.info("Forcing model detection to Nitro by restarting drivers and daemon")
+        """Restart linuwu-sense driver and AcerSense daemon service with nitro_v4 parameter"""
+        log.info("Forcing model detection to Nitro by restarting drivers and AcerSense daemon")
 
         try:
             # Remove the module
@@ -165,9 +163,9 @@ class DAMXManager:
             time.sleep(3)
             
             # Restart the daemon service
-            log.info("Restarting DAMX daemon service (may produce an error)")
-            subprocess.run(['sudo', 'systemctl', 'restart', 'damx-daemon.service'], check=True)
-            
+            log.info("Restarting AcerSense daemon service (may produce an error)")
+            subprocess.run(['sudo', 'systemctl', 'restart', 'acersense-daemon.service'], check=True)
+
             return True
         
         except Exception as e:
@@ -699,7 +697,7 @@ class DAMXManager:
         )
 
     def get_all_settings(self) -> Dict:
-        """Get all DAMX-Daemon settings as a dictionary"""
+        """Get all AcerSense daemon settings as a dictionary"""
         settings = {
             "laptop_type": self.laptop_type.name,
             "has_four_zone_kb": self.has_four_zone_kb,
@@ -760,7 +758,7 @@ class DAMXManager:
 class DaemonServer:
     """Unix Socket server for IPC with the GUI client"""
 
-    def __init__(self, manager: DAMXManager):
+    def __init__(self, manager: AcerSenseDaemon):
         self.manager = manager
         self.socket = None
         self.running = False
@@ -1296,20 +1294,8 @@ class DAMXDaemon:
         self.load_config()
 
         try:
-            # Initialize DAMXManager
-            self.manager = DAMXManager()
-
-            # Initialize keyboard monitor early
-            # self.keyboard_monitor = KeyboardMonitor(
-            #     target_keycode=425, 
-            #     command_to_run="DAMX",  # Updated command
-            #     logger=log
-            # )
-            # kb_success = self.keyboard_monitor.start_monitoring()
-            
-            # if not kb_success:
-            #     log.error("Failed to start keyboard monitoring")
-            #     # Don't return False here - continue with reduced functionality
+            # Initialize daemon manager
+            self.manager = AcerSenseDaemon()
 
             # Initialize power monitor
             self.power_monitor = PowerSourceDetector(self.manager)
@@ -1337,20 +1323,12 @@ class DAMXDaemon:
         signal.signal(signal.SIGTERM, self.signal_handler)
         signal.signal(signal.SIGINT, self.signal_handler)
 
-        # if self.keyboard_monitor:
-        #     success = self.keyboard_monitor.start_monitoring()
-        #     if success:
-        #         log.info("Keyboard monitoring started successfully")
-        #     else:
-        #         log.warning("Failed to start keyboard monitoring")
-
         # Set up and run the server
         try:
             self.running = True
             self.server = DaemonServer(self.manager)
             self.power_monitor.start_monitoring()
             self.server.start()
-            # Start keyboard monitoring
             
         except Exception as e:
             log.error(f"Error running daemon: {e}")
@@ -1366,10 +1344,6 @@ class DAMXDaemon:
         if self.server:
             self.server.stop()
             self.server.cleanup_socket()  # Additional cleanup
-            # Stop keyboard monitoring
-        # if hasattr(self, 'keyboard_monitor') and self.keyboard_monitor:
-        #     self.keyboard_monitor.stop_monitoring()
-        #     log.info("Keyboard monitoring stopped")
     
         if self.power_monitor:
             self.power_monitor.stop_monitoring()
@@ -1392,9 +1366,9 @@ class DAMXDaemon:
 
 def parse_args():
     """Parse command line arguments"""
-    parser = argparse.ArgumentParser(description="DAMX-Daemon")
+    parser = argparse.ArgumentParser(description="AcerSense Daemon")
     parser.add_argument('-v', '--verbose', action='store_true', help="Enable verbose logging")
-    parser.add_argument('--version', action='version', version=f"DAMX-Daemon v{VERSION}")
+    parser.add_argument('--version', action='version', version=f"AcerSense-Daemon v{VERSION}")
     parser.add_argument('--debug', action='store_true', help="Enable debug mode")
     parser.add_argument('--config', type=str, help=f"Path to config file (default: {CONFIG_PATH})")
     return parser.parse_args()
@@ -1413,7 +1387,7 @@ def main():
     """Main function"""
     args = parse_args()
     
-    log.info(f"Driver Version: {DAMXManager().get_driver_version()}")
+    log.info(f"Driver Version: {AcerSenseDaemon().get_driver_version()}")
 
     # Set log level based on verbosity
     if args.verbose:
@@ -1431,9 +1405,6 @@ def main():
     else:
         log.error("Failed to set up daemon, exiting...")
         sys.exit(1)
-
-    
-
 
 if __name__ == "__main__":
     main()
