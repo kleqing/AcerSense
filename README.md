@@ -1,92 +1,71 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/6d383e82-8221-438b-9d6d-a19e998fcc59" alt="icon" width="80" style="vertical-align: middle;">
+  <img src="https://raw.githubusercontent.com/kleqing/AcerSense/refs/heads/main/AcerSense/icon.png" alt="icon" width="80" style="vertical-align: middle;">
 </p>
 
 <h1 align="center">
-  Div Acer Manager Max
+  AcerSense
 </h1>
 
-**Div Acer Manager Max** is a feature-rich Linux GUI utility for Acer laptops powered by the incredible [Linuwu Sense](https://github.com/0x7375646F/Linuwu-Sense) drivers. It replicates and expands on Acer’s NitroSense and PredatorSense capabilities on Linux with full fan control, performance modes, battery optimization, backlight settings, and more — all wrapped in a modern Avalonia-based UI.
+**AcerSense** is the ***reworked*** version of the original [DAMX](https://github.com/PXDiv/Div-Acer-Manager-Max) by PXDiv, which is a Linux GUI for Acer laptops using Linuwu Sense drivers — all wrapped in a modern Avalonia-based UI. This is a replicates of NitroSense and PredatorSense but for Linux!
 
-> [!CAUTION]
-> Project is under active development.
+> [!Attention]
+> The project will be development more if there was a huge changed with the origin branch
 
-![Title Image](https://github.com/user-attachments/assets/a60898a6-a2b8-432e-b5a2-8d0a45c63484)
+![Image]()
 
 
-<h4 align="center">
-⭐ Please star this repository to show support. It motivates me to make the project better for everyone
+<h4 align="center" style="font-style: italic">
+ This is the fork version of <a href="https://github.com/PXDiv/Div-Acer-Manager-Max">DAMX</a> with better UI
 </h4>  
+
+## ❓ Why "Rework"
+
+- Uh,... It is just my sudden inspiration. After finding a lot of 'NitroSense for Linux' in the internet, I found that every tools/drivers are not supported for my model. Even I edited the [linuwu_sense](https://github.com/0x7375646F/Linuwu-Sense/blob/main/src/linuwu_sense.c) to make the DMI matched with my device, Linuwu Sense still not supported my device. After read the README, I found that a GUI tool called DAMX that can supported my device by edit the modified version of [linuwu_sense](https://github.com/PXDiv/Div-Linuwu-Sense) (PXDiv). But the UI is too bad for me so I fork his project and modify a bit.
 
 ## ✨ Features
 
-### ✅ Fully Implemented
+***All the original features of the DAMX are still here. My version is just modify the UI to make it look better!***
 
-* 🔋 **Performance / Thermal Profiles**
-  Eco, Silent, Balanced, Performance, Turbo — automatically adjusted based on AC/battery status
-  (e.g., Turbo hidden when on battery or unsupported)
+- 🔋 **Performance / Thermal Profiles**
+  - Eco, Silent, Balanced, Performance, Turbo — automatically adjusted based on AC/battery status
+  (e.g., Turbo hidden when on battery or unsupported). **Only Nitro V (not 5) and Predator has this feature**
 
-* 🌡 **Fan Control**
-  Manual and Auto fan speed modes
-  Manual disabled automatically when in Quiet profile
+- 🌡 **Fan Control**
+  - Manual and auto fan speed modes
+  - Manual disabled automatically when in Quiet profile
 
-* 💡 **LCD Override Setting**
-  Direct control over LCD power behavior
+- 💡 **LCD Override Setting**
+  - Direct control over LCD power behavior
 
-* 🎨 **Keyboard Backlight Timeout Control**
-  Customize the keyboard backlight timeout
+- 🎨 **Keyboard Backlight Control**
+  - Customize the keyboard backlight timeout
+  - Auto set keyboard backlight brightness slider based on the [acer-wmi](https://github.com/torvalds/linux/blob/master/drivers/platform/x86/acer-wmi.c) output
 
-* 🔊 **Boot Animation and Sound Toggle**
-  Enable/disable Acer's startup animations and sounds
+- 🔊 **Boot Animation and Sound Toggle**
+  - Enable/disable Acer's startup animations and sounds
 
-* 💻 **Live System Info Display**
-  Shows real-time performance profile, fan settings, calibration state, and more
+- 💻 **Live System Info Display**
+  - Shows real-time performance profile, fan settings, calibration state, and more
 
-* 🧠 **Smart Daemon (Low Resource Use)**
+- 🧠 **Smart Daemon (Low Resource Use)**
+  - Auto-detects feature support per device
+  - Communicates with GUI in real-time
+  - Lightweight: consume less RAM
+  - Can run **independently** of GUI
+  - Recursive restart to fix software issues similar to those on Windows
 
-  * Auto-detects feature support per device
-  * Communicates with GUI in real-time
-  * Lightweight: uses \~10MB RAM
-  * Can run **independently** of GUI
-  * Recursive restart to fix software issues similar to those on Windows
-
-* 🖥️ **Modern GUI**
-
-  * Avalonia-based, clean and responsive
-  * Realtime Monitoring with Dashboard and accurate Tempreature Readings
-  * Dynamic UI hides unsupported features
-  * Real-time feedback from daemon
+- 🖥️ **Modern GUI**
+  - Avalonia-based, clean and responsive
+  - Realtime Monitoring with Dashboard and accurate Tempreature Readings
+  - Dynamic UI hides unsupported features
+  - Real-time feedback from daemon
 
 ## 🧭 Compatibilty
-Check your deviced compatibility here: [Compatibility List](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/Compatibility.md)
+Please check the compatibility at here: [Compatibility List](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/Compatibility.md)
 
-> Even if not here, DAMX will still work on most devices. Be sure to put a issue to request your model to be added in the compatiblity list if working.
-
+> Note that the compatibility list may be out date if using this version because it comes with my custom linuwu-sense driver, not from the author!
 
 ## 🖥️ DAMX Installation Guide
-
-You can install DAMX using either of the following methods:
-
-
-### 🔗 Remote Installation
-
-1. Open a terminal window.
-
-2. Run the following command:
-
-   ```bash
-   curl -fsSL https://raw.githubusercontent.com/PXDiv/Div-Acer-Manager-Max/refs/heads/main/scripts/remoteSetup.sh -o /tmp/setup.sh && sudo bash /tmp/setup.sh
-   ```
-
-3. Follow the on-screen prompts.
-
-4. Done!
-
-
-
-### 📦 Local Installation (Alternative Method)
-
-If the remote installation fails for some reason or you've gone offline, follow these steps:
 
 1. Download the latest release from the **Releases** section.
 
@@ -100,7 +79,7 @@ If the remote installation fails for some reason or you've gone offline, follow 
 
 4. Run the script:
 
-   * Right-click the setup file and choose **“Run in Terminal”**,
+   - Right-click the setup file and choose **“Run in Terminal”**,
      or open a terminal in the folder and run:
 
      ```bash
@@ -109,45 +88,41 @@ If the remote installation fails for some reason or you've gone offline, follow 
 
 5. When prompted, choose an option from the menu:
 
-   * `1` → Install
-   * `2` → Install without Drivers
-   * `3` → Uninstall
-   * `4` → Reinstall/Update
+   - `1` → Install
+   - `2` → Install without drivers
+   - `3` → Uninstall
+   - `4` → Reinstall/Update
+   - `5` → Check services status
+   - `q` → Quit
 
 6. Reboot your system after the installation completes.
 
-
-✅ That’s it—you’re all set!
-
-
 ## 🖥️ Troubleshooting
-You can check the logs at /var/log/DAMX_Daemon_Log.log
 
-If you get UNKNOWN as Laptop type, try restarting (it happens somethings) 
+Known issues: [Increase backlight keyboard](https://github.com/kleqing/Linuwu-Sense#%EF%B8%8F-known-issue-fn--f10-keyboard-backlight-key)
+
+
+You can also check the logs at /var/log/DAMX_Daemon_Log.log
+
+If you get UNKNOWN as Laptop type, try restarting (it happens somethings). 
 But if it still happenes that might mean the Drivers Installation failed, Make sure you have the approprite kernel headers to compile the drivers.
 
 Also, check out the [FAQ page](https://github.com/PXDiv/Div-Acer-Manager-Max/blob/main/FAQ.md) before opening any issues.
 
 Please open a new issue or discussion and include the logs to get support and help the project grow if you need any info, report a bug or just give ideas for the future versions of DAMX
 
-## Screenshots 
-![image](https://github.com/user-attachments/assets/10d44e8c-14e4-4441-b60c-538af1840cf6)
-![image](https://github.com/user-attachments/assets/89217b26-b94c-4c78-8fe8-3de2b22a7095)
-![image](https://github.com/user-attachments/assets/72a7b944-5efc-4520-83b6-88069fc05723)
-![image](https://github.com/user-attachments/assets/f9a9d663-70c6-482e-a0c4-15a4ea08a8d2)
 
+## ❤️ Credit
 
-## ❤️ Powered by Linuwu
+- The custom drivers for this project [Linuwu Sense](https://github.com/kleqing/Linuwu-Sense) is a forked from [Div-Linuwu Sense](https://github.com/PXDiv/Div-Linuwu-Sense) project which is built entirely on top of the [Linuwu Sense](https://github.com/0x7375646F/Linuwu-Sense) drivers — huge thanks to their developers for enabling hardware-level access on Acer laptops.
+- [Gemini](https://gemini.google.com/) for the combination of the PredatorSense and NitroSense icon
 
-The custom drivers for this project [Div-Linuwu Sense project](https://github.com/PXDiv/Div-Linuwu-Sense) is built entirely on top of the [Linuwu Sense](https://github.com/0x7375646F/Linuwu-Sense) drivers — huge thanks to their developers for enabling hardware-level access on Acer laptops.
 
 ## 🤝 Contributing
 
-* Report bugs or request features via GitHub Issues
-* Submit pull requests to improve code or UI
-* Help test on different Acer laptop models
-
-
+- Report bugs or request features via GitHub Issues
+- Submit pull requests to improve code or UI
+- Help test on different Acer laptop models
 
 ## 📄 License
 
