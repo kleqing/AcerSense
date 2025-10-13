@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# DAMX Power Source Detection - Monitors power source and adjusts thermal profiles accordingly
+# AcerSense Power Source Detection - Monitors power source and adjusts thermal profiles accordingly
 
 import os
 import logging
@@ -7,7 +7,7 @@ import subprocess
 from threading import Timer
 
 # Get logger from main daemon
-log = logging.getLogger("DAMXDaemon")
+log = logging.getLogger("AcerSenseDaemon")
 
 class PowerSourceDetector:
     """Detects power source and manages automatic mode switching"""

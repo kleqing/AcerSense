@@ -54,5 +54,5 @@ fi
 # Main functionality
 echo "Monitoring keyboard events on $DEVICE"
 evtest "$DEVICE" | grep --line-buffered "code 425.*value 1" | while read -r line; do
-    DAMX &
+    AcerSense &
 done

@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 a = Analysis(
-    ['Daemon.py'],
+    ['AcerSense-Daemon.py'],
     pathex=[],
     binaries=[],
     datas=[],

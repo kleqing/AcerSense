@@ -14,8 +14,8 @@ DESKTOP_FILE_DIR="/usr/share/applications"
 ICON_DIR="/usr/share/icons/hicolor/256x256/apps"
 
 # Legacy paths for cleanup (uppercase naming convention)
-LEGACY_INSTALL_DIR="/opt/ACERSENSE"
-LEGACY_DAEMON_SERVICE_NAME="ACERSENSE-Daemon.service"
+LEGACY_INSTALL_DIR="/opt/acersense"
+LEGACY_DAEMON_SERVICE_NAME="acersense-daemon.service"
 
 # Colors for terminal output
 RED='\033[0;31m'
