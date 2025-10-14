@@ -1,4 +1,4 @@
-sudo pyinstaller --onefile --distpath /home/div/Projects/AcerSense-Daemon/Publish/DaemonPublish/ --clean AcerSense-Daemon.py
+sudo pyinstaller --onefile --distpath ~/Documents/Projects/AcerSense-Daemon/Publish/ --clean AcerSense-Daemon.py
 
 Copy the daemon
 sudo cp /home/div/Projects/AcerSense-Daemon/Publish/DaemonPublish/AcerSense-Daemon ~/Downloads
