@@ -19,6 +19,9 @@ LEGACY_INSTALL_DIR="/opt/acersense"
 LEGACY_DAEMON_SERVICE_NAME="acersense-daemon.service"
 LEGACY_NITRO_BUTTON_SERVICE_NAME="nitrobutton.service"
 
+# Get user info
+TARGET_USER=${SUDO_USER:-$USER}
+
 # Colors for terminal output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -223,6 +226,7 @@ install_daemon() {
 
   # Create installation directory
   mkdir -p ${INSTALL_DIR}/daemon
+  mkdir -p ${INSTALL_DIR}/keyboard
 
   # Copy daemon binary
   cp -f Daemon/AcerSense-Daemon ${INSTALL_DIR}/daemon/
@@ -254,20 +258,21 @@ EOL
   cat > ${SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME} << EOL
 [Unit]
 Description=Nitro Button Service
-After=multi-user.target
+After=graphical.target
 
 [Service]
 Type=simple
 ExecStart=${INSTALL_DIR}/keyboard/NitroButton.sh
 Restart=on-failure
 RestartSec=5
-User=${SUDO_USER:-$USER}
+User=${TARGET_USER}
 Group=input
+Environment="DISPLAY=:0"
 StandardOutput=journal
-StandardError=journal
+StandardError=journal3
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target
 EOL
 
   # Enable and start the service
