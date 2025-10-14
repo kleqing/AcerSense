@@ -5,17 +5,19 @@
 # Components: Linuwu-Sense (drivers), Daemon, and AcerSense GUI
 
 # Constants
-SCRIPT_VERSION="1.0.0"
+SCRIPT_VERSION="1.0"
 INSTALL_DIR="/opt/acersense"
 BIN_DIR="/usr/local/bin"
 SYSTEMD_DIR="/etc/systemd/system"
 DAEMON_SERVICE_NAME="acersense-daemon.service"
+NITRO_BUTTON_SERVICE_NAME="nitrobutton.service"
 DESKTOP_FILE_DIR="/usr/share/applications"
 ICON_DIR="/usr/share/icons/hicolor/256x256/apps"
 
 # Legacy paths for cleanup (uppercase naming convention)
 LEGACY_INSTALL_DIR="/opt/acersense"
 LEGACY_DAEMON_SERVICE_NAME="acersense-daemon.service"
+LEGACY_NITRO_BUTTON_SERVICE_NAME="nitrobutton.service"
 
 # Colors for terminal output
 RED='\033[0;31m'
@@ -70,17 +72,20 @@ cleanup_legacy_installation() {
     if systemctl is-active --quiet ${LEGACY_DAEMON_SERVICE_NAME} 2>/dev/null; then
       echo "Stopping legacy service..."
       systemctl stop ${LEGACY_DAEMON_SERVICE_NAME}
+      systemctl stop ${LEGACY_NITRO_BUTTON_SERVICE_NAME}
     fi
 
     # Disable the legacy service if it's enabled
     if systemctl is-enabled --quiet ${LEGACY_DAEMON_SERVICE_NAME} 2>/dev/null; then
       echo "Disabling legacy service..."
       systemctl disable ${LEGACY_DAEMON_SERVICE_NAME}
+      systemctl disable ${LEGACY_NITRO_BUTTON_SERVICE_NAME}
     fi
 
     # Remove the legacy service file
     echo "Removing legacy service file..."
     rm -f "${SYSTEMD_DIR}/${LEGACY_DAEMON_SERVICE_NAME}"
+    rm -f "${SYSTEMD_DIR}/${LEGACY_NITRO_BUTTON_SERVICE_NAME}"
     cleanup_performed=true
   fi
 
@@ -127,17 +132,20 @@ comprehensive_cleanup() {
   if systemctl is-active --quiet ${DAEMON_SERVICE_NAME} 2>/dev/null; then
     echo "Stopping current Daemon service..."
     systemctl stop ${DAEMON_SERVICE_NAME}
+    systemctl stop ${NITRO_BUTTON_SERVICE_NAME}
   fi
 
   if systemctl is-enabled --quiet ${DAEMON_SERVICE_NAME} 2>/dev/null; then
     echo "Disabling current Daemon service..."
     systemctl disable ${DAEMON_SERVICE_NAME}
+    systemctl disable ${NITRO_BUTTON_SERVICE_NAME}
   fi
 
   # Remove current service file
   if [ -f "${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME}" ]; then
     echo "Removing current service file..."
     rm -f "${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME}"
+    rm -f "${SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME}"
   fi
 
   # Clean up legacy installations
@@ -220,6 +228,10 @@ install_daemon() {
   cp -f Daemon/AcerSense-Daemon ${INSTALL_DIR}/daemon/
   chmod +x ${INSTALL_DIR}/daemon/AcerSense-Daemon
 
+  # Copy the NitroButton script
+  cp -f scripts/NitroButton.sh ${INSTALL_DIR}/keyboard/
+  chmod +x ${INSTALL_DIR}/keyboard/NitroButton.sh
+
   # Create systemd service file with improved configuration
   cat > ${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME} << EOL
 [Unit]
@@ -239,17 +251,43 @@ StandardError=journal
 WantedBy=multi-user.target
 EOL
 
+  cat > ${SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME} << EOL
+[Unit]
+Description=Nitro Button Service
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=${INSTALL_DIR}/keyboard/NitroButton.sh
+Restart=on-failure
+RestartSec=5
+User=${SUDO_USER:-$USER}
+Group=input
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+EOL
+
   # Enable and start the service
   systemctl daemon-reload
   systemctl enable ${DAEMON_SERVICE_NAME}
   systemctl start ${DAEMON_SERVICE_NAME}
 
+  # Enable and start the NitroButton service
+  systemctl enable ${NITRO_BUTTON_SERVICE_NAME}
+  systemctl start ${NITRO_BUTTON_SERVICE_NAME}
+
   # Verify service is running
   if systemctl is-active --quiet ${DAEMON_SERVICE_NAME}; then
     echo -e "${GREEN}Daemon installed and service started successfully!${NC}"
+    echo -e "${GREEN}NitroButton service started successfully!${NC}"
+    echo -e "Now you can run the AcerSense GUI using the Nitro/Predator button!"
     return 0
   else
     echo -e "${RED}Warning: Daemon service may not have started correctly. Check with 'systemctl status ${DAEMON_SERVICE_NAME}'${NC}"
+    echo -e "${RED}Warning: NitroButton service may not have started correctly. Check with 'systemctl status ${NITRO_BUTTON_SERVICE_NAME}'${NC}"
     return 1
   fi
 }
