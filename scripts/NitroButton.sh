@@ -1,4 +1,4 @@
-#!/bin-bash
+#!/bin/bash
 
 # Find keyboard device
 DEVICE=$(grep -A 5 -B 5 "keyboard\|Keyboard" /proc/bus/input/devices | grep -m 1 "event" | sed 's/.*event\([0-9]\+\).*/\/dev\/input\/event\1/')
