@@ -24,6 +24,7 @@ setup_permissions() {
     fi
     
     echo "Permission setup complete."
+    echo "Please reboot or re-login for changes to take effect."
 }
 
 # Find keyboard device
@@ -36,18 +37,19 @@ fi
 
 # Check if we're root (sudo)
 if [ "$(id -u)" -eq 0 ]; then
-    # Running as root - perform setup then re-exec as normal user
     setup_permissions
-    echo "Re-launching as normal user..."
-    exec sudo -u $SUDO_USER "$0"
-    exit 0
+    echo "Continuing as root..."
+else
+    echo "Please run this script with sudo:"
+    echo "  sudo $0"
+    exit 1
 fi
 
 # Check permissions
 if [ ! -r "$DEVICE" ]; then
     echo "Error: Cannot read $DEVICE (permission denied)."
     echo "Please run this script with sudo to set up permissions:"
-    echo "  sudo $0"
+    echo "sudo $0"
     exit 1
 fi
 
