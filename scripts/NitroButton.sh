@@ -8,7 +8,7 @@ if [ -z "$DEVICE" ]; then
     exit 1
 fi
 
-# Check permissions - Đoạn này vẫn hữu ích để debug
+# Check permissions
 if [ ! -r "$DEVICE" ]; then
     echo "Error: Cannot read $DEVICE (permission denied)."
     echo "Make sure your user is in the 'input' group and log out/in again."
@@ -17,7 +17,6 @@ fi
 
 # Main functionality
 echo "Monitoring keyboard events on $DEVICE"
-# Sử dụng exec để evtest thay thế tiến trình bash, tiết kiệm tài nguyên
 exec evtest "$DEVICE" | grep --line-buffered "code 425.*value 1" | while read -r line; do
     /opt/acersense/gui/AcerSense &
 done
