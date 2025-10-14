@@ -19,8 +19,10 @@ LEGACY_INSTALL_DIR="/opt/acersense"
 LEGACY_DAEMON_SERVICE_NAME="acersense-daemon.service"
 LEGACY_NITRO_BUTTON_SERVICE_NAME="nitrobutton.service"
 
-# Get user info
+# Get user info - Prepare for user-level service
 TARGET_USER=${SUDO_USER:-$USER}
+USER_HOME=$(getent passwd $TARGET_USER | cut -d: -f6) 
+USER_SYSTEMD_DIR="${USER_HOME}/.config/systemd/user"
 
 # Colors for terminal output
 RED='\033[0;31m'
@@ -75,20 +77,22 @@ cleanup_legacy_installation() {
     if systemctl is-active --quiet ${LEGACY_DAEMON_SERVICE_NAME} 2>/dev/null; then
       echo "Stopping legacy service..."
       systemctl stop ${LEGACY_DAEMON_SERVICE_NAME}
-      systemctl stop ${LEGACY_NITRO_BUTTON_SERVICE_NAME}
     fi
+
+    echo "Stopping user NitroButton service for ${TARGET_USER}..."
+    machinectl shell ${TARGET_USER}@.host /bin/bash -c \
+      "systemctl --user disable --now ${LEGACY_NITRO_BUTTON_SERVICE_NAME}" 2>/dev/null || true
 
     # Disable the legacy service if it's enabled
     if systemctl is-enabled --quiet ${LEGACY_DAEMON_SERVICE_NAME} 2>/dev/null; then
       echo "Disabling legacy service..."
       systemctl disable ${LEGACY_DAEMON_SERVICE_NAME}
-      systemctl disable ${LEGACY_NITRO_BUTTON_SERVICE_NAME}
     fi
 
     # Remove the legacy service file
     echo "Removing legacy service file..."
     rm -f "${SYSTEMD_DIR}/${LEGACY_DAEMON_SERVICE_NAME}"
-    rm -f "${SYSTEMD_DIR}/${LEGACY_NITRO_BUTTON_SERVICE_NAME}"
+    rm -f "${USER_SYSTEMD_DIR}/${LEGACY_NITRO_BUTTON_SERVICE_NAME}"
     cleanup_performed=true
   fi
 
@@ -119,6 +123,8 @@ cleanup_legacy_installation() {
   if [ "$cleanup_performed" = true ]; then
     echo "Reloading systemd daemon configuration..."
     systemctl daemon-reload
+    machinectl shell ${TARGET_USER}@.host /bin/bash -c \
+      "systemctl --user daemon-reload" 2>/dev/null || true
     echo -e "${GREEN}Legacy installation cleanup completed.${NC}"
   else
     echo -e "${GREEN}No legacy installations found.${NC}"
@@ -135,20 +141,23 @@ comprehensive_cleanup() {
   if systemctl is-active --quiet ${DAEMON_SERVICE_NAME} 2>/dev/null; then
     echo "Stopping current Daemon service..."
     systemctl stop ${DAEMON_SERVICE_NAME}
-    systemctl stop ${NITRO_BUTTON_SERVICE_NAME}
   fi
+
+  echo "Stopping user NitroButton service for ${TARGET_USER}..."
+  machinectl shell ${TARGET_USER}@.host /bin/bash -c \
+    "systemctl --user disable --now ${NITRO_BUTTON_SERVICE_NAME}" 2>/dev/null || true
 
   if systemctl is-enabled --quiet ${DAEMON_SERVICE_NAME} 2>/dev/null; then
     echo "Disabling current Daemon service..."
     systemctl disable ${DAEMON_SERVICE_NAME}
-    systemctl disable ${NITRO_BUTTON_SERVICE_NAME}
   fi
 
   # Remove current service file
   if [ -f "${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME}" ]; then
     echo "Removing current service file..."
     rm -f "${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME}"
-    rm -f "${SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME}"
+    echo "Removing user service file..."
+    rm -f "${USER_SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME}"
   fi
 
   # Clean up legacy installations
@@ -174,7 +183,9 @@ comprehensive_cleanup() {
 
   # Final systemd daemon reload
   systemctl daemon-reload
-
+  machinectl shell ${TARGET_USER}@.host /bin/bash -c \
+    "systemctl --user daemon-reload" 2>/dev/null || true
+    
   echo -e "${GREEN}Comprehensive cleanup completed.${NC}"
   return 0
 }
@@ -255,25 +266,26 @@ StandardError=journal
 WantedBy=multi-user.target
 EOL
 
-  cat > ${SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME} << EOL
+  # Create user-level systemd service for NitroButton
+
+  mkdir -p "$USER_SYSTEMD_DIR"
+
+  cat > ${USER_SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME} << EOL
 [Unit]
-Description=Nitro Button Service
-After=graphical.target
+Description=NitroSense Button Service
+PartOf=graphical-session.target
 
 [Service]
 Type=simple
 ExecStart=${INSTALL_DIR}/keyboard/NitroButton.sh
 Restart=on-failure
 RestartSec=5
-User=${TARGET_USER}
-Group=input
-Environment="DISPLAY=:0"
-StandardOutput=journal
-StandardError=journal3
 
 [Install]
-WantedBy=graphical.target
+WantedBy=graphical-session.target
 EOL
+
+  chown ${TARGET_USER}:${TARGET_USER} "${USER_SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME}"
 
   # Enable and start the service
   systemctl daemon-reload
@@ -281,18 +293,26 @@ EOL
   systemctl start ${DAEMON_SERVICE_NAME}
 
   # Enable and start the NitroButton service
-  systemctl enable ${NITRO_BUTTON_SERVICE_NAME}
-  systemctl start ${NITRO_BUTTON_SERVICE_NAME}
+  echo -e "${BLUE}Configuring user-level service for ${TARGET_USER}...${NC}"
+  machinectl shell ${TARGET_USER}@.host /bin/bash <<EOF
+systemctl --user daemon-reload
+systemctl --user enable --now ${NITRO_BUTTON_SERVICE_NAME}
+EOF
 
   # Verify service is running
   if systemctl is-active --quiet ${DAEMON_SERVICE_NAME}; then
     echo -e "${GREEN}Daemon installed and service started successfully!${NC}"
-    echo -e "${GREEN}NitroButton service started successfully!${NC}"
-    echo -e "Now you can run the AcerSense GUI using the Nitro/Predator button!"
-    return 0
+    if machinectl shell ${TARGET_USER}@.host /bin/bash -c "systemctl --user is-active --quiet ${NITRO_BUTTON_SERVICE_NAME}"; then
+      echo -e "${GREEN}NitroButton service for user '${TARGET_USER}' started successfully!${NC}"
+      echo -e "Now you can run the AcerSense GUI using the Nitro/Predator button!"
+      return 0
+    else
+      echo -e "${RED}Warning: NitroButton user service failed to start.${NC}"
+      echo -e "${YELLOW}Check with: systemctl --user status ${NITRO_BUTTON_SERVICE_NAME}${NC}"
+      return 1
+    fi
   else
     echo -e "${RED}Warning: Daemon service may not have started correctly. Check with 'systemctl status ${DAEMON_SERVICE_NAME}'${NC}"
-    echo -e "${RED}Warning: NitroButton service may not have started correctly. Check with 'systemctl status ${NITRO_BUTTON_SERVICE_NAME}'${NC}"
     return 1
   fi
 }
