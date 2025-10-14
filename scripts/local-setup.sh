@@ -10,19 +10,24 @@ INSTALL_DIR="/opt/acersense"
 BIN_DIR="/usr/local/bin"
 SYSTEMD_DIR="/etc/systemd/system"
 DAEMON_SERVICE_NAME="acersense-daemon.service"
-NITRO_BUTTON_SERVICE_NAME="nitrobutton.service"
 DESKTOP_FILE_DIR="/usr/share/applications"
 ICON_DIR="/usr/share/icons/hicolor/256x256/apps"
+NITRO_BUTTON_DESKTOP_NAME="nitrobutton.desktop"
 
 # Legacy paths for cleanup (uppercase naming convention)
 LEGACY_INSTALL_DIR="/opt/acersense"
 LEGACY_DAEMON_SERVICE_NAME="acersense-daemon.service"
-LEGACY_NITRO_BUTTON_SERVICE_NAME="nitrobutton.service"
+LEGACY_RULES_FILE="01-nitro-keyboard.rules"
+LEGACY_DESKTOP_FILE="nitrobutton.desktop"
 
-# Get user info - Prepare for user-level service
+# User .config directory for NitroButton autostart
 TARGET_USER=${SUDO_USER:-$USER}
-USER_HOME=$(getent passwd $TARGET_USER | cut -d: -f6) 
-USER_SYSTEMD_DIR="${USER_HOME}/.config/systemd/user"
+USER_HOME=$(getent passwd $TARGET_USER | cut -d: -f6)
+USER_CONFIG_DIR="$USER_HOME/.config/autostart"
+
+# Udev rules directory and file
+UDEV_RULES_DIR="/etc/udev/rules.d"
+UDEV_RULES_FILE="01-nitro-keyboard.rules"
 
 # Colors for terminal output
 RED='\033[0;31m'
@@ -79,10 +84,6 @@ cleanup_legacy_installation() {
       systemctl stop ${LEGACY_DAEMON_SERVICE_NAME}
     fi
 
-    echo "Stopping user NitroButton service for ${TARGET_USER}..."
-    machinectl shell ${TARGET_USER}@.host /bin/bash -c \
-      "systemctl --user disable --now ${LEGACY_NITRO_BUTTON_SERVICE_NAME}" 2>/dev/null || true
-
     # Disable the legacy service if it's enabled
     if systemctl is-enabled --quiet ${LEGACY_DAEMON_SERVICE_NAME} 2>/dev/null; then
       echo "Disabling legacy service..."
@@ -92,8 +93,18 @@ cleanup_legacy_installation() {
     # Remove the legacy service file
     echo "Removing legacy service file..."
     rm -f "${SYSTEMD_DIR}/${LEGACY_DAEMON_SERVICE_NAME}"
-    rm -f "${USER_SYSTEMD_DIR}/${LEGACY_NITRO_BUTTON_SERVICE_NAME}"
-    cleanup_performed=true
+
+    # Remove legacy udev rule
+    if [ -f "${UDEV_RULES_DIR}/${LEGACY_RULES_FILE}" ]; then
+      echo "Removing legacy udev rule..."
+      rm -f "${UDEV_RULES_DIR}/${LEGACY_RULES_FILE}"
+    fi
+
+    # Remove legacy NitroButton autostart entry
+    if [ -f "${USER_CONFIG_DIR}/${LEGACY_DESKTOP_FILE}" ]; then
+      echo "Removing legacy NitroButton autostart entry..."
+      rm -f "${USER_CONFIG_DIR}/${LEGACY_DESKTOP_FILE}"
+    fi
   fi
 
   # Check for legacy installation directory (uppercase naming)
@@ -123,8 +134,7 @@ cleanup_legacy_installation() {
   if [ "$cleanup_performed" = true ]; then
     echo "Reloading systemd daemon configuration..."
     systemctl daemon-reload
-    machinectl shell ${TARGET_USER}@.host /bin/bash -c \
-      "systemctl --user daemon-reload" 2>/dev/null || true
+
     echo -e "${GREEN}Legacy installation cleanup completed.${NC}"
   else
     echo -e "${GREEN}No legacy installations found.${NC}"
@@ -143,22 +153,18 @@ comprehensive_cleanup() {
     systemctl stop ${DAEMON_SERVICE_NAME}
   fi
 
-  echo "Stopping user NitroButton service for ${TARGET_USER}..."
-  machinectl shell ${TARGET_USER}@.host /bin/bash -c \
-    "systemctl --user disable --now ${NITRO_BUTTON_SERVICE_NAME}" 2>/dev/null || true
-
   if systemctl is-enabled --quiet ${DAEMON_SERVICE_NAME} 2>/dev/null; then
     echo "Disabling current Daemon service..."
     systemctl disable ${DAEMON_SERVICE_NAME}
   fi
 
-  # Remove current service file
-  if [ -f "${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME}" ]; then
-    echo "Removing current service file..."
-    rm -f "${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME}"
-    echo "Removing user service file..."
-    rm -f "${USER_SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME}"
-  fi
+  echo "Removing system files..."
+  rm -f "${SYSTEMD_DIR}/${DAEMON_SERVICE_NAME}"
+  rm -f "${UDEV_RULES_DIR}/${UDEV_RULES_FILE}"
+
+  # Remove NitroButton autostart entry
+  echo "Removing user-specific files..."
+  rm -f "${USER_CONFIG_DIR}/${NITRO_BUTTON_DESKTOP_NAME}"
 
   # Clean up legacy installations
   cleanup_legacy_installation
@@ -169,6 +175,13 @@ comprehensive_cleanup() {
   rm -f ${BIN_DIR}/AcerSense
   rm -f ${DESKTOP_FILE_DIR}/acersense.desktop
   rm -f ${ICON_DIR}/acersense.png
+
+  # Remove user from input group for security
+  if id -nG "$TARGET_USER" | grep -qw "input"; then
+    echo -e "${BLUE}Removing user '${TARGET_USER}' from 'input' group...${NC}"
+    gpasswd -d "$TARGET_USER" input >/dev/null 2>&1 || true
+    echo -e "${YELLOW}Note: You may need to log out and back in for group changes to take effect.${NC}"
+  fi
 
   # Uninstall drivers if Linuwu-Sense folder exists
   if [ -d "Linuwu-Sense" ]; then
@@ -183,8 +196,6 @@ comprehensive_cleanup() {
 
   # Final systemd daemon reload
   systemctl daemon-reload
-  machinectl shell ${TARGET_USER}@.host /bin/bash -c \
-    "systemctl --user daemon-reload" 2>/dev/null || true
     
   echo -e "${GREEN}Comprehensive cleanup completed.${NC}"
   return 0
@@ -226,6 +237,10 @@ install_drivers() {
 }
 
 install_daemon() {
+  if ! getent group input >/dev/null; then
+    echo "Creating 'input' group..."
+    groupadd input
+  fi
   echo -e "${YELLOW}Installing Daemon...${NC}"
 
   if [ ! -d "Daemon" ]; then
@@ -266,56 +281,49 @@ StandardError=journal
 WantedBy=multi-user.target
 EOL
 
-  # Create user-level systemd service for NitroButton
-
-  mkdir -p "$USER_SYSTEMD_DIR"
-
-  cat > ${USER_SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME} << EOL
-[Unit]
-Description=NitroSense Button Service
-PartOf=graphical-session.target
-
-[Service]
-Type=simple
-ExecStart=${INSTALL_DIR}/keyboard/NitroButton.sh
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=graphical-session.target
+  cat > ${UDEV_RULES_DIR}/${UDEV_RULES_FILE} << EOL
+    SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="*keyboard*|*Keyboard*", MODE="0660", GROUP="input"
 EOL
 
-  chown ${TARGET_USER}:${TARGET_USER} "${USER_SYSTEMD_DIR}/${NITRO_BUTTON_SERVICE_NAME}"
+  # Create autostart for NitroButton script
+  cat > ${USER_CONFIG_DIR}/${NITRO_BUTTON_DESKTOP_NAME} << EOL
+[Desktop Entry]
+Type=Application
+Name=NitroButton Service
+Comment=Listen for the NitroSense key press
+Exec=/opt/acersense/keyboard/NitroButton.sh
+Terminal=false
+NoDisplay=true
+EOL
 
+  # Set ownership for user config files
+  chown ${TARGET_USER}:${TARGET_USER} "${USER_CONFIG_DIR}/${NITRO_BUTTON_DESKTOP_NAME}"
+
+  # Reload udev rules
+  udevadm control --reload-rules
+  udevadm trigger
+
+  # Add the target user to the 'input' group to grant access
+  echo -e "${BLUE}Adding user '${TARGET_USER}' to the 'input' group for keyboard access...${NC}"
+  usermod -aG input ${TARGET_USER}
+  
   # Enable and start the service
   systemctl daemon-reload
   systemctl enable ${DAEMON_SERVICE_NAME}
   systemctl start ${DAEMON_SERVICE_NAME}
 
-  # Enable and start the NitroButton service
-  echo -e "${BLUE}Configuring user-level service for ${TARGET_USER}...${NC}"
-  machinectl shell ${TARGET_USER}@.host /bin/bash <<EOF
-systemctl --user daemon-reload
-systemctl --user enable --now ${NITRO_BUTTON_SERVICE_NAME}
-EOF
-
   # Verify service is running
   if systemctl is-active --quiet ${DAEMON_SERVICE_NAME}; then
-    echo -e "${GREEN}Daemon installed and service started successfully!${NC}"
-    if machinectl shell ${TARGET_USER}@.host /bin/bash -c "systemctl --user is-active --quiet ${NITRO_BUTTON_SERVICE_NAME}"; then
-      echo -e "${GREEN}NitroButton service for user '${TARGET_USER}' started successfully!${NC}"
-      echo -e "Now you can run the AcerSense GUI using the Nitro/Predator button!"
+      echo -e "${GREEN}Daemon service installed and started successfully!${NC}"
+      echo -e "${YELLOW}IMPORTANT: You must LOG OUT and LOG BACK IN for the NitroButton to work.${NC}"
       return 0
-    else
-      echo -e "${RED}Warning: NitroButton user service failed to start.${NC}"
-      echo -e "${YELLOW}Check with: systemctl --user status ${NITRO_BUTTON_SERVICE_NAME}${NC}"
-      return 1
-    fi
   else
-    echo -e "${RED}Warning: Daemon service may not have started correctly. Check with 'systemctl status ${DAEMON_SERVICE_NAME}'${NC}"
-    return 1
+      echo -e "${RED}Warning: Daemon service may not have started correctly.${NC}"
+      echo -e "${YELLOW}Please check with: systemctl status ${DAEMON_SERVICE_NAME}${NC}"
+      return 1
   fi
 }
+
 
 install_gui() {
   echo -e "${YELLOW}Installing AcerSense...${NC}"
@@ -354,7 +362,7 @@ Keywords=acer;laptop;system;
 EOL
 
   # Create command shortcut
-  cat > ${BIN_DIR}/ACERSENSE << EOL
+  cat > ${BIN_DIR}/AcerSense << EOL
 #!/bin/bash
 ${INSTALL_DIR}/gui/AcerSense "\$@"
 EOL
