@@ -16,5 +16,5 @@ fi
 
 # Main functionality
 exec evtest "$DEVICE" | grep --line-buffered "code 425.*value 1" | while read -r line; do
-    /opt/acersense/gui/AcerSense &
+    AcerSense &
 done
