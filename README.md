@@ -11,11 +11,10 @@
 > [!CAUTION]
 > The project will be development more if there was a huge changed with the origin branch
 
-![Image]()
-
+![Image](https://github.com/user-attachments/assets/d684c630-5b0a-482e-acea-0b3933987312)
 
 <h4 align="center" style="font-style: italic">
- This is the fork version of <a href="https://github.com/PXDiv/Div-Acer-Manager-Max">DAMX</a> with better UI
+ The forked version of <a href="https://github.com/PXDiv/Div-Acer-Manager-Max">DAMX</a> with better UI
 </h4>  
 
 ## ❓ Why "Rework"
@@ -76,15 +75,16 @@ Please check the compatibility at here: [Compatibility List](https://github.com/
    ```bash
    chmod +x setup.sh
    ```
-
+  
 4. Run the script:
 
    - Right-click the setup file and choose **“Run in Terminal”**,
      or open a terminal in the folder and run:
 
      ```bash
-     ./setup.sh
+     sudo ./setup.sh
      ```
+  - If you forgot sudo, the script can automatically check if it run with sudo or not then it will notify you to type password of the root user
 
 5. When prompted, choose an option from the menu:
 
@@ -101,7 +101,6 @@ Please check the compatibility at here: [Compatibility List](https://github.com/
 
 Known issues: [Increase backlight keyboard](https://github.com/kleqing/Linuwu-Sense#%EF%B8%8F-known-issue-fn--f10-keyboard-backlight-key)
 
-
 You can also check the logs at /var/log/DAMX_Daemon_Log.log
 
 If you get UNKNOWN as Laptop type, try restarting (it happens somethings). 
@@ -111,12 +110,10 @@ Also, check out the [FAQ page](https://github.com/kleqing/AcerSense/blob/main/FA
 
 Please open a new issue or discussion and include the logs to get support and help the project grow if you need any info, report a bug or just give ideas for the future versions of DAMX
 
-
 ## ❤️ Credit
 
 - The custom drivers for this project [Linuwu Sense](https://github.com/kleqing/Linuwu-Sense) is a forked from [Div-Linuwu Sense](https://github.com/PXDiv/Div-Linuwu-Sense) project which is built entirely on top of the [Linuwu Sense](https://github.com/0x7375646F/Linuwu-Sense) drivers — huge thanks to their developers for enabling hardware-level access on Acer laptops.
 - [Gemini](https://gemini.google.com/) for the combination of the PredatorSense and NitroSense icon
-
 
 ## 🤝 Contributing
 
